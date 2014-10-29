@@ -33,10 +33,30 @@ def DectoTime(dec):
     return str(hour)+':'+str(minute)+ampm
 
 
-'''
-def Day(day, shiftNum):
-    shiftDict={}
-    x=0
-    while shiftNum<x:
-        
-'''
+class Day:
+    '''
+    The Day class keeps a dictionary consisting of the 
+    start and stop times of each shift in the form
+    {start:stop, start:stop}
+    '''
+    def __init__(self):
+        self.shiftDict = {}
+    def addShift(self, start, end):
+        self.shiftDict[start] = end
+
+class TM:
+
+    def __init__(self, maxHours):
+        self.maxHours = maxHours
+        self.totalTime = 0
+        self.blackList = []
+    def addShift(self, time):
+        self.totalTime += time
+    def maxHours(self, newShift):
+        if self.totalTime + newShift > self.maxHours:
+            return False
+        elif self.totalTime + newShift <= self.maxHours:
+            return True
+    def blackList(self, day):
+        self.blackList.append(day)
+
