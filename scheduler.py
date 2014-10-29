@@ -45,7 +45,11 @@ class Day:
         self.shiftDict[start] = end
 
 class TM:
-
+    '''
+    Maintains a class for each employee (TM). Keeps track of 
+    maximum hours, a blacklist for days they can't work, and functions
+    to add a shift
+    '''
     def __init__(self, maxHours):
         self.maxHours = maxHours
         self.totalTime = 0
