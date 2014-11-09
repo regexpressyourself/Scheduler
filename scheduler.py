@@ -1,9 +1,35 @@
+def CheckTime(time):
+    '''
+    checks that time is entered in the format "hh:mma" or "hh:mmp"
+    '''
+    while True:
+        try:
+            float(time.split(':')[0])
+            if len(((time.split(':')[0])))==2:
+                try:
+                    float((time.split(':')[1][:2]))
+                    if len(((time.split(':')[1][:2])))==2:
+                        if str((time.split(':')[1][2]))=='a' or str((time.split(':')[1][2]))=='b':
+                            break
+                    else:
+                        print 'Please enter time in hh:mma or hh:mmp format'
+                        time=raw_input('Please re-enter time: ')
+                except:
+                    print 'Please enter time in hh:mma or hh:mmp format'
+                    time=raw_input('Please re-enter time: ')
+            else:
+                print 'Please enter time in hh:mma or hh:mmp format'
+                time=raw_input('Please re-enter time: ')
+        except:
+            print 'Please enter time in hh:mma or hh:mmp format'
+            time=raw_input('Please re-enter time: ')
+    return time
+
 def TimetoDec(time):
     '''
     time is entered in the format "hh:mma" or "hh:mmp" and returned in a 
     decimal form from 00.00 up to 23.99
     '''
-    
     hour = float(time.split(':')[0])
     minute = float(time.split(':')[1][:2])
     ampm = str(time.split(':')[1][2])
@@ -12,7 +38,7 @@ def TimetoDec(time):
         hour += 12.0
 
     minute = minute/60.0
-       
+
     return hour+minute
 
 
@@ -37,12 +63,23 @@ class Day:
     '''
     The Day class keeps a dictionary consisting of the 
     start and stop times of each shift in the form
-    {start:stop, start:stop}
+    {start:stop, start:stop}.
+    Times are maintained in both decimal and regular form.
     '''
     def __init__(self):
-        self.shiftDict = {}
-    def addShift(self, start, end):
-        self.shiftDict[start] = end
+        self.shiftRegDict = {}
+        self.shiftDecDict = {}
+    def addShift(self):
+        print 'List of current shifts:'
+        print self.shiftRegDict
+        start = CheckTime(raw_input('Enter the start time of the shift: '))
+        end = CheckTime(raw_input('Enter the end time of the shift: '))
+        self.shiftRegDict[start] = end
+        self.shiftDecDict[TimetoDec(start)] = TimetoDec(end)
+#    def editShift(self):
+         
+    def viewShift(self):
+        return self.shiftRegDict
 
 class TM:
     '''
@@ -63,4 +100,9 @@ class TM:
             return True
     def blackList(self, day):
         self.blackList.append(day)
+
+
+
+x=Day()
+x.addShift()
 

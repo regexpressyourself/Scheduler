@@ -1,0 +1,17 @@
+First working version:
+
+TM class tracks how many hours a TM can work alongside 
+how many hour they have worked already.
+
+Day class handles a dictionary of {start:end} shift info.
+It supports the ability to add shifts for each day and store
+them in the dictionary.
+
+User inputs shifts for each day and max hours for each TM. The
+program automatically assigns random shifts to random employees
+and outputs the data into a excell file. 
+
+If shifts are left blank due to lack of employees, shift will
+be displayed "BLANK"
+
+
