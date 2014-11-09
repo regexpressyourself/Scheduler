@@ -11,6 +11,9 @@ def CheckTime(time):
                     if len(((time.split(':')[1][:2])))==2:
                         if str((time.split(':')[1][2]))=='a' or str((time.split(':')[1][2]))=='b':
                             break
+                        else:
+                            print 'Please enter time in hh:mma or hh:mmp format'
+                            time=raw_input('Please re-enter time: ')
                     else:
                         print 'Please enter time in hh:mma or hh:mmp format'
                         time=raw_input('Please re-enter time: ')
@@ -101,8 +104,32 @@ class TM:
     def blackList(self, day):
         self.blackList.append(day)
 
+Monday = Day()
+Tuesday = Day()
+Wednesday = Day()
+Thursday = Day()
+Friday = Day()
+Saturday = Day()
+Sunday = Day()
 
-
-x=Day()
-x.addShift()
-
+dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
+'''
+for day in dayDict:
+    shiftNum = int(raw_input('How many shifts for ' + dayDict[day] + '? '))
+    x = 0
+    while x < shiftNum:
+        day.addShift()
+        day.viewShift()
+        x+=1
+'''
+tmDict={}
+tmNum = int(raw_input('How many employees are you staffing? '))
+x = 0
+while x < tmNum:
+    name = raw_input('What is the name of employee number %i? '%(x+1))
+    tmHours = int(raw_input('How many hours can %s work? '%name))
+    classname = name
+    classname = TM(tmHours)
+    tmDict[classname] = name
+    print tmDict
+    x += 1
