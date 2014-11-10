@@ -32,6 +32,15 @@ def CheckTime(time):
             time=raw_input('Please re-enter time: ')
     return time
 
+def CheckInt(num):
+    while True:
+        try: 
+            int(num)
+            return int(num)
+            break
+        except ValueError:
+            num = raw_input('Please enter an integer: ')
+
 def TimetoDec(time):
     '''
     time is entered in the format "hh:mma" or "hh:mmp" and returned in a 
@@ -80,8 +89,6 @@ class Day:
         self.shiftDecDict = {}
         self.shiftDecList = []
     def addShift(self):
-        print 'List of current shifts:'
-        print self.shiftRegDict
         start = CheckTime(raw_input('Enter the start time of the shift: '))
         end = CheckTime(raw_input('Enter the end time of the shift: '))
         self.shiftRegList.append((start,end))
@@ -140,7 +147,7 @@ dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
 
 for day in dayList:
-    shiftNum = int(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
+    shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
     while x < shiftNum:
         day.addShift()
@@ -150,11 +157,11 @@ for day in dayList:
 
 tmDict = {}
 tmList = []
-tmNum = int(raw_input('How many employees are you staffing? '))
+tmNum = CheckInt(raw_input('How many employees are you staffing? '))
 x = 0
 while x < tmNum:
     name = raw_input('What is the name of employee number %i? '%(x+1))
-    tmHours = int(raw_input('How many hours can %s work? '%name))
+    tmHours = CheckInt(raw_input('How many hours can %s work? '%name))
     classname = name
     classname = TM(tmHours)
     tmList.append(classname)
@@ -182,6 +189,10 @@ for day in dayDict:
                 x+=1
 
 for tm in tmList:
-    print tmDict[tm] + ' - ',
-    print tm.printShiftDict
+    print tmDict[tm] + ':'
+    for day in dayList:
+        if day in tm.shiftDict:
+            print dayDict[day],
+            for item in tm.printShiftDict[dayDict[day]]:
+                print item + ' - ' +  tm.printShiftDict[dayDict[day]][item]
 
