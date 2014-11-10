@@ -1,4 +1,5 @@
 import random
+import xlwt
 
 def CheckTime(time):
     '''
@@ -124,7 +125,7 @@ class TM:
     def addShift(self, day, stringday, start, stop):
         shiftTime = stop-start
         self.shiftDict[day] = {start:stop}
-        self.printShiftDict[stringday] = {DectoTime(start):DectoTime(stop)}
+        self.printShiftDict[day] = {DectoTime(start):DectoTime(stop)}
         self.totalTime += shiftTime
     def maxHours(self, newShift):
         if self.totalTime + newShift > self.maxHours:
@@ -187,7 +188,7 @@ for day in dayDict:
                 break
             else:
                 x+=1
-
+'''
 for tm in tmList:
     print tmDict[tm] + ':'
     for day in dayList:
@@ -195,4 +196,24 @@ for tm in tmList:
             print dayDict[day],
             for item in tm.printShiftDict[dayDict[day]]:
                 print item + ' - ' +  tm.printShiftDict[dayDict[day]][item]
+'''
 
+#Excel
+
+workbook = xlwt.Workbook()
+sheet = workbook.add_sheet('Schedule')
+x=0
+while x<len(dayList):
+    sheet.write(0,x+1,dayDict[dayList[x]])
+    x += 1
+
+x=1
+for tm in tmList:
+    sheet.write(x,0,tmDict[tm])
+    for shift in tm.printShiftDict:
+        for item in tm.printShiftDict[shift]:
+            time = item + ' - ' +  tm.printShiftDict[shift][item]
+        sheet.write(x, dayList.index(shift)+1, time)
+        
+    x += 1
+workbook.save('schedule.xls')
