@@ -1,3 +1,5 @@
+import random
+
 def CheckTime(time):
     '''
     checks that time is entered in the format "hh:mma" or "hh:mmp"
@@ -9,7 +11,9 @@ def CheckTime(time):
                 try:
                     float((time.split(':')[1][:2]))
                     if len(((time.split(':')[1][:2])))==2:
-                        if str((time.split(':')[1][2]))=='a' or str((time.split(':')[1][2]))=='b':
+                        if str((time.split(':')[1][2]))=='a':
+                            break
+                        elif str((time.split(':')[1][2]))=='p':
                             break
                         else:
                             print 'Please enter time in hh:mma or hh:mmp format'
@@ -17,13 +21,13 @@ def CheckTime(time):
                     else:
                         print 'Please enter time in hh:mma or hh:mmp format'
                         time=raw_input('Please re-enter time: ')
-                except:
+                except ValueError:
                     print 'Please enter time in hh:mma or hh:mmp format'
                     time=raw_input('Please re-enter time: ')
             else:
                 print 'Please enter time in hh:mma or hh:mmp format'
                 time=raw_input('Please re-enter time: ')
-        except:
+        except ValueError:
             print 'Please enter time in hh:mma or hh:mmp format'
             time=raw_input('Please re-enter time: ')
     return time
@@ -38,7 +42,8 @@ def TimetoDec(time):
     ampm = str(time.split(':')[1][2])
 
     if ampm == 'p':
-        hour += 12.0
+        if hour != 12:
+            hour += 12.0
 
     minute = minute/60.0
 
@@ -71,14 +76,18 @@ class Day:
     '''
     def __init__(self):
         self.shiftRegDict = {}
+        self.shiftRegList = []
         self.shiftDecDict = {}
+        self.shiftDecList = []
     def addShift(self):
         print 'List of current shifts:'
         print self.shiftRegDict
         start = CheckTime(raw_input('Enter the start time of the shift: '))
         end = CheckTime(raw_input('Enter the end time of the shift: '))
-        self.shiftRegDict[start] = end
-        self.shiftDecDict[TimetoDec(start)] = TimetoDec(end)
+        self.shiftRegList.append((start,end))
+        self.shiftRegDict = dict(self.shiftRegList)
+        self.shiftDecList.append((TimetoDec(start),TimetoDec(end)))
+        self.shiftDecDict = dict(self.shiftDecList)
 #    def editShift(self):
          
     def viewShift(self):
@@ -94,8 +103,22 @@ class TM:
         self.maxHours = maxHours
         self.totalTime = 0
         self.blackList = []
-    def addShift(self, time):
-        self.totalTime += time
+        self.shiftDict = {}
+        self.printShiftDict = {}
+    def canWork(self, day, start, end):
+        shiftTime = end-start
+        if self.totalTime + shiftTime <= self.maxHours:
+            if day not in self.shiftDict:
+                return True
+            else:
+                return False
+        else:
+            return False
+    def addShift(self, day, stringday, start, stop):
+        shiftTime = stop-start
+        self.shiftDict[day] = {start:stop}
+        self.printShiftDict[stringday] = {DectoTime(start):DectoTime(stop)}
+        self.totalTime += shiftTime
     def maxHours(self, newShift):
         if self.totalTime + newShift > self.maxHours:
             return False
@@ -112,17 +135,21 @@ Friday = Day()
 Saturday = Day()
 Sunday = Day()
 
+dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
+
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
-'''
-for day in dayDict:
-    shiftNum = int(raw_input('How many shifts for ' + dayDict[day] + '? '))
+
+for day in dayList:
+    shiftNum = int(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
     while x < shiftNum:
         day.addShift()
         day.viewShift()
         x+=1
-'''
-tmDict={}
+
+
+tmDict = {}
+tmList = []
 tmNum = int(raw_input('How many employees are you staffing? '))
 x = 0
 while x < tmNum:
@@ -130,6 +157,31 @@ while x < tmNum:
     tmHours = int(raw_input('How many hours can %s work? '%name))
     classname = name
     classname = TM(tmHours)
+    tmList.append(classname)
     tmDict[classname] = name
-    print tmDict
     x += 1
+
+for day in dayDict:
+    for shift in day.shiftDecDict:
+        numList = []
+        for num in range(0,len(tmList)):
+            numList.append(num)
+        random.shuffle(numList)
+        x=0
+        while True:
+            shiftTM = tmList[numList[x]]
+            if shiftTM.canWork(day, shift, day.shiftDecDict[shift]):
+                shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
+                break
+            elif x >= len(numList):
+                print 'Following shift could not be assigned:'
+                print dayDict[day],
+                print str(DectoTime(shift)) + '-' + str(DectoTime(day.shiftDecDict[shift]))
+                break
+            else:
+                x+=1
+
+for tm in tmList:
+    print tmDict[tm] + ' - ',
+    print tm.printShiftDict
+
