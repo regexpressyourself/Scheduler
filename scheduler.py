@@ -34,6 +34,9 @@ def CheckTime(time):
     return time
 
 def CheckInt(num):
+    '''
+    Checks that number is integer
+    '''
     while True:
         try: 
             int(num)
@@ -124,8 +127,16 @@ class TM:
             return False
     def addShift(self, day, stringday, start, stop):
         shiftTime = stop-start
-        self.shiftDict[day] = {start:stop}
-        self.printShiftDict[day] = {DectoTime(start):DectoTime(stop)}
+        try: 
+            self.shiftDict[day]    
+            self.shiftDict[day][start] = stop
+        except:
+            self.shiftDict[day] = {start:stop}
+        try:
+            self.printShiftDict[day]
+            self.printShiftDict[day][DectoTime(start)] = DectoTime(stop)
+        except:
+            self.printShiftDict[day] = {DectoTime(start):DectoTime(stop)}
         self.totalTime += shiftTime
     def maxHours(self, newShift):
         if self.totalTime + newShift > self.maxHours:
@@ -135,6 +146,9 @@ class TM:
     def blackList(self, day):
         self.blackList.append(day)
 
+'''
+classify all the days
+'''
 Monday = Day()
 Tuesday = Day()
 Wednesday = Day()
@@ -143,10 +157,16 @@ Friday = Day()
 Saturday = Day()
 Sunday = Day()
 
+# dayList is used mostly for indexing purposes, as dictionaries have no index
 dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 
+'''
+ dayDict allows the class name to correlate with a string of the name for
+ printing purposes
+'''
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
 
+# get the number of shifts for each day
 for day in dayList:
     shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
@@ -155,10 +175,15 @@ for day in dayList:
         day.viewShift()
         x+=1
 
-
+'''
+tmDict and tmList work simlarly to dayDict and dayList to store classes and
+printable names for all the employees
+'''
 tmDict = {}
 tmList = []
 tmNum = CheckInt(raw_input('How many employees are you staffing? '))
+
+#make a class for each tm and a add a corresponding name
 x = 0
 while x < tmNum:
     name = raw_input('What is the name of employee number %i? '%(x+1))
@@ -168,7 +193,16 @@ while x < tmNum:
     tmList.append(classname)
     tmDict[classname] = name
     x += 1
+unassigned = TM(999999999999999999999999999999999)
+'''
+OK this is the convuluted part. We have all the pieces in place and now have to
+assign shifts to all the employees. We want:
 
+    [x]random assignment of shifts to employees
+    [x]does not go over hours alloted for each TM
+    [ ]does not interfere with TM day off/shift off requests
+    [ ]if possible, avoid clopens
+'''
 for day in dayDict:
     for shift in day.shiftDecDict:
         numList = []
@@ -177,43 +211,43 @@ for day in dayDict:
         random.shuffle(numList)
         x=0
         while True:
-            shiftTM = tmList[numList[x]]
-            if shiftTM.canWork(day, shift, day.shiftDecDict[shift]):
-                shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
-                break
-            elif x >= len(numList):
+            if x >= len(numList):
                 print 'Following shift could not be assigned:'
                 print dayDict[day],
                 print str(DectoTime(shift)) + '-' + str(DectoTime(day.shiftDecDict[shift]))
+
+                unassigned.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
+                break
+            else:
+                shiftTM = tmList[numList[x]]
+            if shiftTM.canWork(day, shift, day.shiftDecDict[shift]):
+                shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
                 x+=1
-'''
-for tm in tmList:
-    print tmDict[tm] + ':'
-    for day in dayList:
-        if day in tm.shiftDict:
-            print dayDict[day],
-            for item in tm.printShiftDict[dayDict[day]]:
-                print item + ' - ' +  tm.printShiftDict[dayDict[day]][item]
-'''
 
 #Excel
 
 workbook = xlwt.Workbook()
 sheet = workbook.add_sheet('Schedule')
+
 x=0
+
 while x<len(dayList):
     sheet.write(0,x+1,dayDict[dayList[x]])
     x += 1
 
 x=1
+tmList.append(unassigned)
+tmDict[unassigned] = 'unassigned'
 for tm in tmList:
     sheet.write(x,0,tmDict[tm])
-    for shift in tm.printShiftDict:
-        for item in tm.printShiftDict[shift]:
-            time = item + ' - ' +  tm.printShiftDict[shift][item]
-        sheet.write(x, dayList.index(shift)+1, time)
-        
+    for day in tm.printShiftDict:
+        y = 0
+        for shift in tm.printShiftDict[day]:
+            time = shift + ' - ' +  tm.printShiftDict[day][shift]
+            sheet.write(x+y, dayList.index(day)+1, time)
+            y += 1
     x += 1
+
 workbook.save('schedule.xls')
