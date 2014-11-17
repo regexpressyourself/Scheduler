@@ -77,7 +77,14 @@ def DectoTime(dec):
     else:
         hour = int(time[0])
         ampm = 'a'
-    return str(hour)+':'+str(minute)+ampm
+    hour = str(hour)
+    minute = str(minute)
+    if len(minute)<2:
+        if minute == '0':
+            minute = '0' + minute
+        else:
+            minute = minute + '0'
+    return hour + ':' + minute + ampm
 
 
 class Day:
@@ -92,9 +99,7 @@ class Day:
         self.shiftRegList = []
         self.shiftDecDict = {}
         self.shiftDecList = []
-    def addShift(self):
-        start = CheckTime(raw_input('Enter the start time of the shift: '))
-        end = CheckTime(raw_input('Enter the end time of the shift: '))
+    def addShift(self, start, end):
         self.shiftRegList.append((start,end))
         self.shiftRegDict = dict(self.shiftRegList)
         self.shiftDecList.append((TimetoDec(start),TimetoDec(end)))
@@ -116,13 +121,15 @@ class TM:
         self.blackList = []
         self.shiftDict = {}
         self.printShiftDict = {}
-    def canWork(self, day, start, end):
+    def canWork(self, day, strDay, start, end):
         shiftTime = end-start
         if self.totalTime + shiftTime <= self.maxHours:
-            if day not in self.shiftDict:
-                return True
-            else:
+            if day in self.shiftDict:
                 return False
+            elif strDay.lower() in self.blackList:
+                return False
+            else:
+                return True
         else:
             return False
     def addShift(self, day, stringday, start, stop):
@@ -143,8 +150,8 @@ class TM:
             return False
         elif self.totalTime + newShift <= self.maxHours:
             return True
-    def blackList(self, day):
-        self.blackList.append(day)
+    def blacklist(self, day):
+        self.blackList += (day)
 
 '''
 classify all the days
@@ -160,6 +167,9 @@ Sunday = Day()
 # dayList is used mostly for indexing purposes, as dictionaries have no index
 dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 
+dayPrintList = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+
+
 '''
  dayDict allows the class name to correlate with a string of the name for
  printing purposes
@@ -167,14 +177,44 @@ dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
 
 # get the number of shifts for each day
+Monday.addShift('07:00a','03:30p')
+Monday.addShift('02:00p','10:30p')
+Monday.addShift('11:00a','06:30p')
+
+Tuesday.addShift('07:00a','03:30p')
+Tuesday.addShift('02:00p','10:30p')
+Tuesday.addShift('11:00a','06:30p')
+
+Wednesday.addShift('07:00a','03:30p')
+Wednesday.addShift('02:00p','10:30p')
+Wednesday.addShift('11:00a','06:30p')
+
+Thursday.addShift('07:00a','03:30p')
+Thursday.addShift('02:00p','10:30p')
+Thursday.addShift('11:00a','06:30p')
+
+Friday.addShift('07:00a','03:30p')
+Friday.addShift('02:00p','10:30p')
+Friday.addShift('11:00a','06:30p')
+
+Saturday.addShift('07:00a','03:30p')
+Saturday.addShift('02:00p','10:30p')
+Saturday.addShift('11:00a','06:30p')
+
+Sunday.addShift('07:00a','03:30p')
+Sunday.addShift('02:00p','10:30p')
+Sunday.addShift('11:00a','06:30p')
+''' ------------------------------------------------------------------------
 for day in dayList:
     shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
     while x < shiftNum:
-        day.addShift()
+        start = CheckTime(raw_input('Enter the start time of the shift: '))
+        end = CheckTime(raw_input('Enter the end time of the shift: '))
+        day.addShift(start, end)
         day.viewShift()
         x+=1
-
+'''
 '''
 tmDict and tmList work simlarly to dayDict and dayList to store classes and
 printable names for all the employees
@@ -193,6 +233,17 @@ while x < tmNum:
     tmList.append(classname)
     tmDict[classname] = name
     x += 1
+
+for tm in tmList:
+    while True:
+        blacklist = raw_input("What days can't %s work? (just enter 'done' to skip)" %tmDict[tm])
+        if blacklist in dayPrintList:
+            tm.blacklist(blacklist)
+        elif blacklist == 'done':
+            break
+        else:
+            print "Please enter a day, or simply enter 'done' to finish"
+
 unassigned = TM(999999999999999999999999999999999)
 '''
 OK this is the convuluted part. We have all the pieces in place and now have to
@@ -220,7 +271,8 @@ for day in dayDict:
                 break
             else:
                 shiftTM = tmList[numList[x]]
-            if shiftTM.canWork(day, shift, day.shiftDecDict[shift]):
+                
+            if shiftTM.canWork(day, dayDict[day], shift, day.shiftDecDict[shift]):
                 shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
