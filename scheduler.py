@@ -1,3 +1,13 @@
+'''
+------------
+TO DO
+------------
+    [x]random assignment of shifts to employees
+    [x]does not go over hours alloted for each TM
+    [ ]does not interfere with TM day off/shift off requests
+    [ ]if possible, avoid clopens
+
+'''
 import random
 import xlwt
 
@@ -151,7 +161,7 @@ class TM:
         elif self.totalTime + newShift <= self.maxHours:
             return True
     def blacklist(self, day):
-        self.blackList += (day)
+        self.blackList.append(day)
 
 '''
 classify all the days
@@ -239,7 +249,7 @@ for tm in tmList:
         blacklist = raw_input("What days can't %s work? (just enter 'done' to skip)" %tmDict[tm])
         if blacklist in dayPrintList:
             tm.blacklist(blacklist)
-        elif blacklist == 'done':
+        elif blacklist == '':
             break
         else:
             print "Please enter a day, or simply enter 'done' to finish"
@@ -248,12 +258,8 @@ unassigned = TM(999999999999999999999999999999999)
 '''
 OK this is the convuluted part. We have all the pieces in place and now have to
 assign shifts to all the employees. We want:
-
-    [x]random assignment of shifts to employees
-    [x]does not go over hours alloted for each TM
-    [ ]does not interfere with TM day off/shift off requests
-    [ ]if possible, avoid clopens
 '''
+
 for day in dayDict:
     for shift in day.shiftDecDict:
         numList = []
@@ -266,18 +272,15 @@ for day in dayDict:
                 print 'Following shift could not be assigned:'
                 print dayDict[day],
                 print str(DectoTime(shift)) + '-' + str(DectoTime(day.shiftDecDict[shift]))
-
                 unassigned.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
                 shiftTM = tmList[numList[x]]
-                
             if shiftTM.canWork(day, dayDict[day], shift, day.shiftDecDict[shift]):
                 shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
                 x+=1
-
 #Excel
 
 workbook = xlwt.Workbook()
@@ -300,6 +303,7 @@ for tm in tmList:
             time = shift + ' - ' +  tm.printShiftDict[day][shift]
             sheet.write(x+y, dayList.index(day)+1, time)
             y += 1
+    sheet.write(x,9,tm.totalTime)
     x += 1
 
 workbook.save('schedule.xls')
