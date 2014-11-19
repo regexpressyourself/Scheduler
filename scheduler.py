@@ -6,6 +6,20 @@ TO DO
     [x]does not go over hours alloted for each TM
     [ ]does not interfere with TM day off/shift off requests
     [ ]if possible, avoid clopens
+    [ ]change inputs for day off inputs
+    [ ]comment out code
+    [ ]refine excel worksheet- colors, bold, data manipulation, etc
+    [ ]add shift preference
+    [ ]get off cli
+    [ ]
+    [ ]
+    [ ]
+    [ ]
+    [ ]
+    [ ]
+    [ ]
+    [ ]
+    [ ]
 
 '''
 import random
