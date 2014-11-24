@@ -4,14 +4,15 @@ TO DO
 ------------
     [x]random assignment of shifts to employees
     [x]does not go over hours alloted for each TM
-    [ ]does not interfere with TM day off/shift off requests
+    [x]does not interfere with TM day off requests
+    [ ]does not interfere with TM shift off requests
     [ ]if possible, avoid clopens
     [ ]change inputs for day off inputs
     [ ]comment out code
     [ ]refine excel worksheet- colors, bold, data manipulation, etc
     [ ]add shift preference
     [ ]get off cli
-    [ ]
+    [x]fix day off user input
     [ ]
     [ ]
     [ ]
@@ -191,8 +192,8 @@ Sunday = Day()
 # dayList is used mostly for indexing purposes, as dictionaries have no index
 dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 
+#dayPrintList is for error checking the days off entries
 dayPrintList = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
-
 
 '''
  dayDict allows the class name to correlate with a string of the name for
@@ -200,7 +201,7 @@ dayPrintList = ['monday','tuesday','wednesday','thursday','friday','saturday','s
 '''
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
 
-# get the number of shifts for each day
+#testing data
 Monday.addShift('07:00a','03:30p')
 Monday.addShift('02:00p','10:30p')
 Monday.addShift('11:00a','06:30p')
@@ -229,6 +230,7 @@ Sunday.addShift('07:00a','03:30p')
 Sunday.addShift('02:00p','10:30p')
 Sunday.addShift('11:00a','06:30p')
 ''' ------------------------------------------------------------------------
+#get shift data for each day
 for day in dayList:
     shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
@@ -258,20 +260,29 @@ while x < tmNum:
     tmDict[classname] = name
     x += 1
 
+# add days off to tm.blackList
 for tm in tmList:
     while True:
-        blacklist = raw_input("What days can't %s work? (just enter 'done' to skip)" %tmDict[tm])
+        blacklist = raw_input("What days can't %s work? (press enter to skip ) "%tmDict[tm]).lower()
         if blacklist in dayPrintList:
             tm.blacklist(blacklist)
         elif blacklist == '':
             break
         else:
-            print "Please enter a day, or simply enter 'done' to finish"
+            print "Please enter a day, or press enter to finish "
 
+#unassigned stores all the extra shifts (hence the huge "maxhour" number)
 unassigned = TM(999999999999999999999999999999999)
+
 '''
-OK this is the convuluted part. We have all the pieces in place and now have to
-assign shifts to all the employees. We want:
+OK this is the convuluted part. Here goes:
+- For every shift, a string of random integers (which reperesent the index
+numbers of tmList) is generated.
+- Using these random integers, a tm is selcted at random. If they pass the
+"caWork" test, the shift is assigned to them. Otherwise, we just continue down
+the list.
+- If every TM fails the "canWork" test, the shift is assigned to "unassigned" and
+an error message is printed. 
 '''
 
 for day in dayDict:
@@ -295,7 +306,8 @@ for day in dayDict:
                 break
             else:
                 x+=1
-#Excel
+
+#Excel printing
 
 workbook = xlwt.Workbook()
 sheet = workbook.add_sheet('Schedule')
@@ -309,6 +321,7 @@ while x<len(dayList):
 x=1
 tmList.append(unassigned)
 tmDict[unassigned] = 'unassigned'
+sheet.write(0,8,"Total Hours")
 for tm in tmList:
     sheet.write(x,0,tmDict[tm])
     for day in tm.printShiftDict:
@@ -317,7 +330,7 @@ for tm in tmList:
             time = shift + ' - ' +  tm.printShiftDict[day][shift]
             sheet.write(x+y, dayList.index(day)+1, time)
             y += 1
-    sheet.write(x,9,tm.totalTime)
+    sheet.write(x,8,tm.totalTime)
     x += 1
 
 workbook.save('schedule.xls')
