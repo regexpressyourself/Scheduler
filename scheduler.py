@@ -143,7 +143,7 @@ class TM:
     def __init__(self, maxHours):
         self.maxHours = maxHours
         self.totalTime = 0
-        self.blackList = []
+        self.blackList = {}
         self.shiftDict = {}
         self.printShiftDict = {}
     def canWork(self, day, strDay, start, end):
@@ -175,8 +175,8 @@ class TM:
             return False
         elif self.totalTime + newShift <= self.maxHours:
             return True
-    def blacklist(self, day):
-        self.blackList.append(day)
+    def blacklist(self, day, dayClass):
+        self.blackList[day] = dayClass
 
 '''
 classify all the days
@@ -192,8 +192,8 @@ Sunday = Day()
 # dayList is used mostly for indexing purposes, as dictionaries have no index
 dayList = [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 
-#dayPrintList is for error checking the days off entries
-dayPrintList = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+#dayPrintDict is for error checking the days off entries
+dayPrintDict = {'monday':Monday,'tuesday':Tuesday,'wednesday':Wednesday,'thursday':Thursday,'friday':Friday,'saturday':Saturday,'sunday':Sunday}
 
 '''
  dayDict allows the class name to correlate with a string of the name for
@@ -264,8 +264,8 @@ while x < tmNum:
 for tm in tmList:
     while True:
         blacklist = raw_input("What days can't %s work? (press enter to skip ) "%tmDict[tm]).lower()
-        if blacklist in dayPrintList:
-            tm.blacklist(blacklist)
+        if blacklist in dayPrintDict:
+            tm.blacklist(blacklist, dayPrintDict[blacklist])
         elif blacklist == '':
             break
         else:
@@ -312,25 +312,46 @@ for day in dayDict:
 workbook = xlwt.Workbook()
 sheet = workbook.add_sheet('Schedule')
 
-x=0
+grey = xlwt.easyxf('pattern: pattern solid;')
+grey.pattern.pattern_fore_colour = 22
 
+bold_string = "font: bold on"
+bold = xlwt.easyxf(bold_string)
+
+x=0
 while x<len(dayList):
-    sheet.write(0,x+1,dayDict[dayList[x]])
+    sheet.write(0,x+1,dayDict[dayList[x]], bold)
     x += 1
 
 x=1
 tmList.append(unassigned)
 tmDict[unassigned] = 'unassigned'
-sheet.write(0,8,"Total Hours")
+sheet.write(0,8,"Total Hours", bold)
 for tm in tmList:
-    sheet.write(x,0,tmDict[tm])
+    sheet.write(x,0,tmDict[tm], bold)
     for day in tm.printShiftDict:
         y = 0
         for shift in tm.printShiftDict[day]:
             time = shift + ' - ' +  tm.printShiftDict[day][shift]
             sheet.write(x+y, dayList.index(day)+1, time)
             y += 1
+    y = 0
+    for day in tm.blackList:
+        sheet.write(x+y, dayList.index(tm.blackList[day])+1, 'Not Available',grey)
+        y += 1
     sheet.write(x,8,tm.totalTime)
     x += 1
+
+x = 1
+while x <= len(tmList)-1:
+    y = 1
+    while y <= len(dayList):
+        try:
+            sheet.write(x, y, '', grey)
+        except:
+            pass
+        y += 1
+    x += 1
+
 
 workbook.save('schedule.xls')
