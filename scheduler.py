@@ -247,6 +247,26 @@ printable names for all the employees
 '''
 tmDict = {}
 tmList = []
+
+Jerry = TM(40)
+Elaine = TM(40)
+George = TM(30)
+Kramer = TM(25)
+Newman = TM(40)
+
+tmList.append(Jerry)
+tmList.append(Elaine)
+tmList.append(George)
+tmList.append(Kramer)
+tmList.append(Newman)
+
+tmDict[Jerry] = 'Jerry'
+tmDict[Elaine] = 'Elaine'
+tmDict[George] = 'George'
+tmDict[Kramer] = 'Kramer'
+tmDict[Newman] = 'Newman'
+
+'''
 tmNum = CheckInt(raw_input('How many employees are you staffing? '))
 
 #make a class for each tm and a add a corresponding name
@@ -270,6 +290,7 @@ for tm in tmList:
             break
         else:
             print "Please enter a day, or press enter to finish "
+'''
 
 #unassigned stores all the extra shifts (hence the huge "maxhour" number)
 unassigned = TM(999999999999999999999999999999999)
@@ -312,46 +333,62 @@ for day in dayDict:
 workbook = xlwt.Workbook()
 sheet = workbook.add_sheet('Schedule')
 
-grey = xlwt.easyxf('pattern: pattern solid;')
+grey = xlwt.easyxf('align: horiz center, vert center; pattern: pattern solid; borders: bottom thick, top thick, left thick, right thick')
 grey.pattern.pattern_fore_colour = 22
 
-bold_string = "font: bold on"
-bold = xlwt.easyxf(bold_string)
+bold = xlwt.easyxf("font: bold on; borders: bottom thick, top thick, left thick, right thick")
+boldcenter = xlwt.easyxf("font: bold on; align: horiz center, vert center; borders: bottom thick, top thick, left thick, right thick")
 
-x=0
-while x<len(dayList):
-    sheet.write(0,x+1,dayDict[dayList[x]], bold)
-    x += 1
+left = xlwt.easyxf('align: horiz center; borders: left thick, top thick, right no_line, bottom no_line')
+right = xlwt.easyxf('align: horiz center; borders: top thick, right thick, bottom no_line, left no_line')
+center = xlwt.easyxf('align: horiz center; borders: top thick, bottom no_line, right no_line, left no_line')
 
-x=1
+thick = xlwt.easyxf('borders: bottom thick, top thick, left thick, right thick')
+
+notop = xlwt.easyxf('borders: bottom thick, left thick, right thick')
+
+x = 3
+y = 0
+while x<len(dayList)*3+3:
+    sheet.write_merge(0, 0, x, x+2, dayDict[dayList[y]], boldcenter)
+    y +=1
+    x += 3
+
 tmList.append(unassigned)
 tmDict[unassigned] = 'unassigned'
-sheet.write(0,8,"Total Hours", bold)
+sheet.write(0, 24, "Total Hours", bold)
+
+x = 1
 for tm in tmList:
-    sheet.write(x,0,tmDict[tm], bold)
+    sheet.write_merge(x, x+1, 0, 1, tmDict[tm], boldcenter)
     for day in tm.printShiftDict:
         y = 0
         for shift in tm.printShiftDict[day]:
-            time = shift + ' - ' +  tm.printShiftDict[day][shift]
-            sheet.write(x+y, dayList.index(day)+1, time)
-            y += 1
-    y = 0
+            sheet.write(x+y, (dayList.index(day)*3)+3, shift, left)
+            sheet.write(x+y, (dayList.index(day)*3)+4, '-', center)
+            sheet.write(x+y, (dayList.index(day)*3)+5, tm.printShiftDict[day][shift], right)
+            sheet.write_merge(x+y+1, x+y+1, (dayList.index(day)*3)+3, (dayList.index(day)*3)+5, '', notop)
+            y += 2
     for day in tm.blackList:
-        sheet.write(x+y, dayList.index(tm.blackList[day])+1, 'Not Available',grey)
-        y += 1
-    sheet.write(x,8,tm.totalTime)
-    x += 1
+        sheet.write(x, dayList.index(tm.blackList[day])+1, 'Not Available',grey)
+    sheet.write_merge(x, x+1, 24, 24, tm.totalTime, thick)
+    x += 2
 
 x = 1
-while x <= len(tmList)-1:
-    y = 1
-    while y <= len(dayList):
+while x < len(tmList)*2+1:
+    sheet.write_merge(x, x+1, 2, 2, '', thick)
+    x += 2
+
+y = 1
+while y <= len(tmList)*2:
+    x = 1
+    while x <= len(dayList)*3+3:
         try:
-            sheet.write(x, y, '', grey)
+            sheet.write_merge(y, y+1, x, x+2, 'OFF', grey)
         except:
             pass
-        y += 1
-    x += 1
+        x += 1
+    y += 1
 
 
 workbook.save('schedule.xls')
