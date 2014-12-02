@@ -43,19 +43,19 @@ def CheckTime(time):
                             break
                         else:
                             print 'Please enter time in hh:mma or hh:mmp format'
-                            time=raw_input('Please re-enter time: \n \n')
+                            time=raw_input('Please re-enter time: ')
                     else:
                         print 'Please enter time in hh:mma or hh:mmp format'
-                        time=raw_input('Please re-enter time: \n \n')
+                        time=raw_input('Please re-enter time: ')
                 except ValueError:
                     print 'Please enter time in hh:mma or hh:mmp format'
-                    time=raw_input('Please re-enter time: \n \n')
+                    time=raw_input('Please re-enter time: ')
             else:
                 print 'Please enter time in hh:mma or hh:mmp format'
-                time=raw_input('Please re-enter time: \n \n')
+                time=raw_input('Please re-enter time: ')
         except ValueError:
             print 'Please enter time in hh:mma or hh:mmp format'
-            time=raw_input('Please re-enter time: \n \n')
+            time=raw_input('Please re-enter time: ')
     return time
 
 def CheckInt(num):
@@ -68,7 +68,7 @@ def CheckInt(num):
             return int(num)
             break
         except ValueError:
-            num = raw_input('Please enter an integer: \n \n')
+            num = raw_input('Please enter an integer: ')
 
 def TimetoDec(time):
     '''
@@ -201,30 +201,79 @@ dayPrintDict = {'monday':Monday,'tuesday':Tuesday,'wednesday':Wednesday,'thursda
 '''
 dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'Thursday', Friday:'Friday', Saturday:'Saturday',Sunday:'Sunday'}
 
+#testing data
+Monday.addShift('07:00a','03:30p')
+Monday.addShift('02:00p','10:30p')
+Monday.addShift('11:00a','06:30p')
+
+Tuesday.addShift('07:00a','03:30p')
+Tuesday.addShift('02:00p','10:30p')
+Tuesday.addShift('11:00a','06:30p')
+
+Wednesday.addShift('07:00a','03:30p')
+Wednesday.addShift('02:00p','10:30p')
+Wednesday.addShift('11:00a','06:30p')
+
+Thursday.addShift('07:00a','03:30p')
+Thursday.addShift('02:00p','10:30p')
+Thursday.addShift('11:00a','06:30p')
+
+Friday.addShift('07:00a','03:30p')
+Friday.addShift('02:00p','10:30p')
+Friday.addShift('11:00a','06:30p')
+
+Saturday.addShift('07:00a','03:30p')
+Saturday.addShift('02:00p','10:30p')
+Saturday.addShift('11:00a','06:30p')
+
+Sunday.addShift('07:00a','03:30p')
+Sunday.addShift('02:00p','10:30p')
+Sunday.addShift('11:00a','06:30p')
+''' ------------------------------------------------------------------------
 #get shift data for each day
 for day in dayList:
-    shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? \n \n'))
+    shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? '))
     x = 0
     while x < shiftNum:
-        start = CheckTime(raw_input('Enter the start time of the shift: \n \n'))
-        end = CheckTime(raw_input('Enter the end time of the shift: \n \n'))
+        start = CheckTime(raw_input('Enter the start time of the shift: '))
+        end = CheckTime(raw_input('Enter the end time of the shift: '))
         day.addShift(start, end)
         day.viewShift()
         x+=1
-
+'''
 '''
 tmDict and tmList work simlarly to dayDict and dayList to store classes and
 printable names for all the employees
 '''
 tmDict = {}
 tmList = []
-tmNum = CheckInt(raw_input('How many employees are you staffing? \n \n'))
+
+Jerry = TM(40)
+Elaine = TM(40)
+George = TM(30)
+Kramer = TM(25)
+Newman = TM(40)
+
+tmList.append(Jerry)
+tmList.append(Elaine)
+tmList.append(George)
+tmList.append(Kramer)
+tmList.append(Newman)
+
+tmDict[Jerry] = 'Jerry'
+tmDict[Elaine] = 'Elaine'
+tmDict[George] = 'George'
+tmDict[Kramer] = 'Kramer'
+tmDict[Newman] = 'Newman'
+
+'''
+tmNum = CheckInt(raw_input('How many employees are you staffing? '))
 
 #make a class for each tm and a add a corresponding name
 x = 0
 while x < tmNum:
-    name = raw_input('What is the name of employee number %i? \n \n'%(x+1))
-    tmHours = CheckInt(raw_input('How many hours can %s work? \n \n'%name))
+    name = raw_input('What is the name of employee number %i? '%(x+1))
+    tmHours = CheckInt(raw_input('How many hours can %s work? '%name))
     classname = name
     classname = TM(tmHours)
     tmList.append(classname)
@@ -234,13 +283,14 @@ while x < tmNum:
 # add days off to tm.blackList
 for tm in tmList:
     while True:
-        blacklist = raw_input("What days can't %s work? (press enter to skip ) \n \n"%tmDict[tm]).lower()
+        blacklist = raw_input("What days can't %s work? (press enter to skip ) "%tmDict[tm]).lower()
         if blacklist in dayPrintDict:
             tm.blacklist(blacklist, dayPrintDict[blacklist])
         elif blacklist == '':
             break
         else:
-            print "Please enter a day, or press enter to finish \n \n"
+            print "Please enter a day, or press enter to finish "
+'''
 
 #unassigned stores all the extra shifts (hence the huge "maxhour" number)
 unassigned = TM(999999999999999999999999999999999)
