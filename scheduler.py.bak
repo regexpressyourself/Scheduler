@@ -63,7 +63,7 @@ def CheckInt(num):
     Checks that number is integer
     '''
     while True:
-        try:
+        try: 
             int(num)
             return int(num)
             break
@@ -72,7 +72,7 @@ def CheckInt(num):
 
 def TimetoDec(time):
     '''
-    time is entered in the format "hh:mma" or "hh:mmp" and returned in a
+    time is entered in the format "hh:mma" or "hh:mmp" and returned in a 
     decimal form from 00.00 up to 23.99
     '''
     hour = float(time.split(':')[0])
@@ -114,7 +114,7 @@ def DectoTime(dec):
 
 class Day:
     '''
-    The Day class keeps a dictionary consisting of the
+    The Day class keeps a dictionary consisting of the 
     start and stop times of each shift in the form
     {start:stop, start:stop}.
     Times are maintained in both decimal and regular form.
@@ -130,13 +130,13 @@ class Day:
         self.shiftDecList.append((TimetoDec(start),TimetoDec(end)))
         self.shiftDecDict = dict(self.shiftDecList)
 #    def editShift(self):
-
+         
     def viewShift(self):
         return self.shiftRegDict
 
 class TM:
     '''
-    Maintains a class for each employee (TM). Keeps track of
+    Maintains a class for each employee (TM). Keeps track of 
     maximum hours, a blacklist for days they can't work, and functions
     to add a shift
     '''
@@ -159,8 +159,8 @@ class TM:
             return False
     def addShift(self, day, stringday, start, stop):
         shiftTime = stop-start
-        try:
-            self.shiftDict[day]
+        try: 
+            self.shiftDict[day]    
             self.shiftDict[day][start] = stop
         except:
             self.shiftDict[day] = {start:stop}
@@ -253,7 +253,7 @@ numbers of tmList) is generated.
 "caWork" test, the shift is assigned to them. Otherwise, we just continue down
 the list.
 - If every TM fails the "canWork" test, the shift is assigned to "unassigned" and
-an error message is printed.
+an error message is printed. 
 '''
 
 for day in dayDict:
