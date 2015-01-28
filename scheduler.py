@@ -25,7 +25,11 @@ TO DO
 '''
 import random
 import xlwt
-
+#check if time is 1-12
+#Add IndexError exception
+#make time input more lenient
+#make all input more lenient
+#user experience
 def CheckTime(time):
     '''
     checks that time is entered in the format "hh:mma" or "hh:mmp"
