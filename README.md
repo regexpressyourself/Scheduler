@@ -3,6 +3,8 @@
 
 An employee scheduling script. 
 
+Warning: I am a beginner programmer. Take this app with a grain of salt.
+
 After 7 years of retail and countless excuses from management about the
 difficulty of creating a schedule, I decided to try to ease the process.
 
@@ -15,29 +17,7 @@ line. I hope to make either a GUI excecutable or web app for use in the future.
 
 ## How to use
 =============
-
-Since Scheduler is a python script, you can run it from the command line,
-assuming you have python installed. However, you will also need to install the xlwt module to write to an excel file.
-
-**Requirements**
-
-- python
-- xlwt module for python
-
-If you do not have python, you can get it here (scheduler uses python 2.7):
-https://www.python.org/downloads/
-The xlwt module can be found here: https://pypi.python.org/pypi/xlwt
-
-**Setting up xlwt**
-
-- download and extract the directory
-- from the command line, cd into the directory and enter the command: 
-"python setup.py install"
-
-Once you have all of the requirements insalled, simply run the scheduler.py
-file, follow the prompts, and the script will generate a "scheduler.xls" file
-containing your schedule! 
-
+Don't. Honestly. It's nowhere near ready. If you want, you're welcome to peruse the code though. It's not complex
 ## Some Notes
 =============
 
