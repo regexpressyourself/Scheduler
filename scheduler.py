@@ -13,66 +13,19 @@ TO DO
     [ ]add shift preference
     [ ]get off cli
     [x]fix day off user input
-    [ ]
-    [ ]
-    [ ]
-    [ ]
-    [ ]
-    [ ]
-    [ ]
+    [x]check if time is 1-12
+    [x]Add IndexError exception for "10" input on time
+    [x]make timeinput more lenient in general
+    [ ]make all input more lenient in general
+    [ ]focus on user experience - could a toddler do it?
+    [ ]on time input, make it more clear what shift you're adding to 
+    [ ]check all raw_inputs for new line on answer. also add new line after the answer
     [ ]
 
 '''
+#!/usr/bin/python2
 import random
 import xlwt
-#check if time is 1-12
-#Add IndexError exception
-#make time input more lenient
-#make all input more lenient
-#user experience
-def CheckTime(time):
-    '''
-    checks that time is entered in the format "hh:mma" or "hh:mmp"
-    '''
-    while True:
-        try:
-            float(time.split(':')[0])
-            if len(((time.split(':')[0])))==2:
-                try:
-                    float((time.split(':')[1][:2]))
-                    if len(((time.split(':')[1][:2])))==2:
-                        if str((time.split(':')[1][2]))=='a':
-                            break
-                        elif str((time.split(':')[1][2]))=='p':
-                            break
-                        else:
-                            print 'Please enter time in hh:mma or hh:mmp format'
-                            time=raw_input('Please re-enter time: \n \n')
-                    else:
-                        print 'Please enter time in hh:mma or hh:mmp format'
-                        time=raw_input('Please re-enter time: \n \n')
-                except ValueError:
-                    print 'Please enter time in hh:mma or hh:mmp format'
-                    time=raw_input('Please re-enter time: \n \n')
-            else:
-                print 'Please enter time in hh:mma or hh:mmp format'
-                time=raw_input('Please re-enter time: \n \n')
-        except ValueError:
-            print 'Please enter time in hh:mma or hh:mmp format'
-            time=raw_input('Please re-enter time: \n \n')
-    return time
-
-def CheckInt(num):
-    '''
-    Checks that number is integer
-    '''
-    while True:
-        try:
-            int(num)
-            return int(num)
-            break
-        except ValueError:
-            num = raw_input('Please enter an integer: \n \n')
 
 def TimetoDec(time):
     '''
@@ -115,6 +68,155 @@ def DectoTime(dec):
             minute = minute + '0'
     return hour + ':' + minute + ampm
 
+def FormatTime(time):
+    '''
+    Sanitize different time inputs to fit the hh:mma/hh:mmp format needed for
+    conversion between decimal value and readable time value. The goal here 
+    is to make the time input a little more intuitive.
+
+    NOTE: CheckInput does a final check in a loop, giving the user a chance to 
+    revise input. FormatTime is meant to fix common input errors for the user.
+    Hopefully, it makes things a little easier.
+    '''
+    try:
+        if time[-1] not in '0123456789':
+            if time[-1] in ['m', 'M']:
+                time = time[:-1]
+            elif time[-1] == 'A':
+                time = time[:-1]
+                time = time + 'a'
+            elif time[-1] == 'P':
+                time = time[:-1]
+                time = time + 'p'
+            else:
+                return False
+        elif time[-1] in ['a','p']:
+            if len(time[:-1]) == 1:
+                flag = raw_input('Did you mean 0' + time[:-1] + ':00' + time[-1] + '? (y or n)')
+                if flag == 'y':
+                    time = '0' + time[:-1] + ':00' + time[-1] 
+                else:
+                    return False
+            elif len(time[:-1]) == 2:
+                flag = raw_input('Did you mean ' + time[:-1] + ':00' + time[-1] + '? (y or n)')
+                if flag == 'y':
+                    time = time[:-1] + ':00' + time[-1] 
+                else:
+                    return False
+            else:
+                return False
+        elif ':' in time:
+            hour = time.split(':')[0]
+            if len(hour) == 1:
+                try:
+                    int(hour)
+                    time = '0' + time 
+                except ValueError:
+                    return False
+            minute = time.split(':')[1]
+            if minute[-1] in ['a', 'b']:
+                minute = minute[:-1]
+                if len(minute) != 2:
+                    return False
+        elif len(time) == 1:
+            try:
+                int(time)
+                flag = raw_input('Did you mean 0' + time + ':00? (y or n)')
+                if flag == 'y':
+                    time = '0' + time + ':00' 
+                else:
+                    return False
+            except ValueError:
+                return False
+        elif len(time) == 2:
+            try:
+                int(time)
+                flag = raw_input('Did you mean ' + time + ':00? (y or n)')
+                if flag == 'y':
+                    time = time + ':00' 
+                else:
+                    return False
+            except ValueError:
+                return False
+        else:
+            return False
+    except IndexError:
+        return False
+    except ValueError:
+        return False
+    if time:
+        if time[-1] not in ['a', 'p']:
+            flag = raw_input('And was that AM or PM? (enter a for am or p for pm)')
+            if flag in ['a', 'am', 'AM', 'Am', 'aM']:
+                time = time + 'a'
+            elif flag in ['p', 'pm', 'PM', 'Pm', 'pM']:
+                time = time + 'p'
+    return time
+
+def CheckTime(time):
+    '''
+    checks that time is entered in the format "hh:mma" or "hh:mmp"
+    '''
+    while True:
+        try:
+            float(time.split(':')[0])
+            if len(((time.split(':')[0]))) == 2:
+                if 0 < int((time.split(':')[0])) < 13:
+                    try:
+                        float((time.split(':')[1][:2]))
+                        if -1 < int((time.split(':')[1][:2])) < 60:
+                            if len(((time.split(':')[1][:2]))) == 2:
+                                if str((time.split(':')[1][2])) == 'a':
+                                    break
+                                elif str((time.split(':')[1][2])) == 'p':
+                                    break
+                                else:
+                                    print 'Please enter time in hh:mma or hh:mmp format'
+                                    time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                            else:
+                                print 'Please enter time in hh:mma or hh:mmp format'
+                                time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                        else:
+                            print 'Please enter time in hh:mma or hh:mmp format'
+                            time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                    except IndexError:
+                        print 'Please enter time in hh:mma or hh:mmp format'
+                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                    except AttributeError:
+                        print 'Please enter time in hh:mma or hh:mmp format'
+                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                    except ValueError:
+                        print 'Please enter time in hh:mma or hh:mmp format'
+                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
+                else:
+                    print 'Please enter time in hh:mma or hh:mmp format'
+                    time = FormatTime(raw_input('Please re-enter time: \n \n'))
+            else:
+                print 'Please enter time in hh:mma or hh:mmp format'
+                time = FormatTime(raw_input('Please re-enter time: \n \n'))
+        except ValueError:
+            print 'Please enter time in hh:mma or hh:mmp format'
+            time = FormatTime(raw_input('Please re-enter time: \n \n'))
+        except AttributeError:
+            print 'Please enter time in hh:mma or hh:mmp format'
+            time = FormatTime(raw_input('Please re-enter time: \n \n'))
+        except IndexError:
+            print 'Please enter time in hh:mma or hh:mmp format'
+            time = FormatTime(raw_input('Please re-enter time: \n \n'))
+
+    return time
+
+def CheckInt(num):
+    '''
+    Checks that number is integer
+    '''
+    while True:
+        try:
+            int(num)
+            return int(num)
+            break
+        except ValueError:
+            num = raw_input('Please enter an integer: \n \n')
 
 class Day:
     '''
@@ -134,7 +236,6 @@ class Day:
         self.shiftDecList.append((TimetoDec(start),TimetoDec(end)))
         self.shiftDecDict = dict(self.shiftDecList)
 #    def editShift(self):
-
     def viewShift(self):
         return self.shiftRegDict
 
@@ -210,11 +311,13 @@ for day in dayList:
     shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? \n \n'))
     x = 0
     while x < shiftNum:
-        start = CheckTime(raw_input('Enter the start time of the shift: \n \n'))
-        end = CheckTime(raw_input('Enter the end time of the shift: \n \n'))
+        start = FormatTime(raw_input('Enter the start time of shift ' + str(x+1) + ' on ' + str(dayDict[day]) + ': \n \n'))
+        CheckTime(start)
+        end = FormatTime(raw_input('Enter the end time of shift' + str(x+1) + ' on ' + str(dayDict[day]) + ': \n \n'))
+        CheckTime(end)
         day.addShift(start, end)
         day.viewShift()
-        x+=1
+        x += 1
 
 '''
 tmDict and tmList work simlarly to dayDict and dayList to store classes and
@@ -266,7 +369,7 @@ for day in dayDict:
         for num in range(0,len(tmList)):
             numList.append(num)
         random.shuffle(numList)
-        x=0
+        x = 0
         while True:
             if x >= len(numList):
                 print 'Following shift could not be assigned:'
@@ -280,7 +383,7 @@ for day in dayDict:
                 shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
-                x+=1
+                x += 1
 
 #Excel printing
 
@@ -305,7 +408,7 @@ x = 3
 y = 0
 while x<len(dayList)*3+3:
     sheet.write_merge(0, 0, x, x+2, dayDict[dayList[y]], boldcenter)
-    y +=1
+    y += 1
     x += 3
 
 tmList.append(unassigned)
