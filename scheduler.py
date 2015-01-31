@@ -88,9 +88,12 @@ def FormatTime(time):
             elif time[-1] == 'P':
                 time = time[:-1]
                 time = time + 'p'
+            elif time[-1] in ['a', 'p']:
+                time = time
+                print time
             else:
                 return False
-        elif time[-1] in ['a','p']:
+        if time[-1] in ['a','p']:
             if len(time[:-1]) == 1:
                 flag = raw_input('Did you mean 0' + time[:-1] + ':00' + time[-1] + '? (y or n)')
                 if flag == 'y':
