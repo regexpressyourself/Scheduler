@@ -117,10 +117,14 @@ def FormatTime(time):
                 except ValueError:
                     return False
             minute = time.split(':')[1]
-            if minute[-1] in ['a', 'b']:
+            if minute[-1] in ['a', 'p']:
                 minute = minute[:-1]
-                if len(minute) != 2:
-                    return False
+            try:
+                int(minute)
+            except ValueError:
+                return False
+            if len(minute) != 2:
+                return False
         elif len(time) == 1:
             try:
                 int(time)
