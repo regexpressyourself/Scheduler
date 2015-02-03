@@ -20,32 +20,12 @@ TO DO
     [ ]focus on user experience - could a toddler do it?
     [ ]on time input, make it more clear what shift you're adding to 
     [ ]check all raw_inputs for new line on answer. also add new line after the answer
-    [ ]check if end time is later than start time
-    [ ]run some checks on the time math
     [ ]
-    [ ]
-    [ ]
+
 '''
 #!/usr/bin/python2
 import random
 import xlwt
-print  ' \n\n\n'
-print '################################################################'
-print '                 Welcome to my scheduling app!                  '
-print 'Find more information at github.com/regexpressyourself/Scheduler'
-print '                           Thanks!                              '
-print '################################################################'
-print "\nNow let's get started\n\n"
-
-def NumberIncrement(number):
-    if number in [1, '1']:
-        return str(number) + 'st'
-    elif number in [2, '2']:
-        return str(number) + 'nd'
-    elif number in [3, '3']:
-        return str(number) + 'rd'
-    else:
-        return str(number) + 'th'
 
 def TimetoDec(time):
     '''
@@ -110,47 +90,20 @@ def FormatTime(time):
                 time = time + 'p'
             elif time[-1] in ['a', 'p']:
                 time = time
+                print time
             else:
                 return False
         if time[-1] in ['a','p']:
             if len(time[:-1]) == 1:
-                while True:
-                    flag = raw_input('Did you mean 0' + time[:-1] + ':00' + time[-1] + '? (y or n)\t')
-                    if flag == '':
-                        time = '0' + time[:-1] + ':00' + time[-1] 
-                        break
-                    elif flag in 'Yy':
-                        time = '0' + time[:-1] + ':00' + time[-1] 
-                        break
-                    elif flag in 'nN':
-                        return False
-                        break
-                    else:
-                        print "Sorry, I didn't get that."
-                        continue
-            elif len(time[:-1]) == 2:
-                while True:
-                    flag = raw_input('Did you mean ' + time[:-1] + ':00' + time[-1] + '? (y or n)\t')
-                    if flag == '':
-                        time = time[:-1] + ':00' + time[-1] 
-                        break
-                    elif flag in 'Yy':
-                        time = time[:-1] + ':00' + time[-1] 
-                        break
-                    elif flag in 'Nn':
-                        return False
-                        break
-                    else:
-                        print "Sorry, I didn't get that."
-                        continue
-            elif len(time[:-1]) == 4:
-                if ':' in time:
-                    time = '0' + time
+                flag = raw_input('Did you mean 0' + time[:-1] + ':00' + time[-1] + '? (y or n)')
+                if flag == 'y':
+                    time = '0' + time[:-1] + ':00' + time[-1] 
                 else:
                     return False
-            elif len(time[:-1]) == 5:
-                if ':' in time:
-                    time = time
+            elif len(time[:-1]) == 2:
+                flag = raw_input('Did you mean ' + time[:-1] + ':00' + time[-1] + '? (y or n)')
+                if flag == 'y':
+                    time = time[:-1] + ':00' + time[-1] 
                 else:
                     return False
             else:
@@ -175,39 +128,21 @@ def FormatTime(time):
         elif len(time) == 1:
             try:
                 int(time)
-                while True:
-                    flag = raw_input('Did you mean 0' + time + ':00? (y or n)\t')
-                    if flag == '':
-                        time = '0' + time + ':00' 
-                        break
-                    elif flag in 'Yy':
-                        time = '0' + time + ':00' 
-                        break
-                    elif flag in 'nN':
-                        return False
-                        break
-                    else:
-                        print "Sorry, I didn't get that."
-                        continue
+                flag = raw_input('Did you mean 0' + time + ':00? (y or n)')
+                if flag == 'y':
+                    time = '0' + time + ':00' 
+                else:
+                    return False
             except ValueError:
                 return False
         elif len(time) == 2:
             try:
                 int(time)
-                while True:
-                    flag = raw_input('Did you mean ' + time + ':00? (y or n)\t')
-                    if flag == '':
-                        time = time + ':00' 
-                        break
-                    elif flag in 'Yy':
-                        time = time + ':00' 
-                        break
-                    elif flag in 'nN':
-                        return False
-                        break
-                    else:
-                        print "Sorry, I didn't get that."
-                        continue
+                flag = raw_input('Did you mean ' + time + ':00? (y or n)')
+                if flag == 'y':
+                    time = time + ':00' 
+                else:
+                    return False
             except ValueError:
                 return False
         else:
@@ -218,17 +153,11 @@ def FormatTime(time):
         return False
     if time:
         if time[-1] not in ['a', 'p']:
-            while True:
-                flag = raw_input('And was that AM or PM? (enter a for am or p for pm)\t')
-                if flag in ['a', 'am', 'AM', 'Am', 'aM']:
-                    time = time + 'a'
-                    break
-                elif flag in ['p', 'pm', 'PM', 'Pm', 'pM']:
-                    time = time + 'p'
-                    break
-                else:
-                    print "Sorry, I didn't get that"
-                    continue
+            flag = raw_input('And was that AM or PM? (enter a for am or p for pm)')
+            if flag in ['a', 'am', 'AM', 'Am', 'aM']:
+                time = time + 'a'
+            elif flag in ['p', 'pm', 'PM', 'Pm', 'pM']:
+                time = time + 'p'
     return time
 
 def CheckTime(time):
@@ -249,49 +178,38 @@ def CheckTime(time):
                                 elif str((time.split(':')[1][2])) == 'p':
                                     break
                                 else:
-                                    print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                                    print 'Please enter time in hh:mma or hh:mmp format'
                                     time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                                    CheckTime(time)
                             else:
-                                print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                                print 'Please enter time in hh:mma or hh:mmp format'
                                 time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                                CheckTime(time)
                         else:
-                            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                            print 'Please enter time in hh:mma or hh:mmp format'
                             time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                            CheckTime(time)
                     except IndexError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print 'Please enter time in hh:mma or hh:mmp format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
                     except AttributeError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print 'Please enter time in hh:mma or hh:mmp format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
                     except ValueError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print 'Please enter time in hh:mma or hh:mmp format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
                 else:
-                    print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                    print 'Please enter time in hh:mma or hh:mmp format'
                     time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                    CheckTime(time)
             else:
-                print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                print 'Please enter time in hh:mma or hh:mmp format'
                 time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                CheckTime(time)
         except ValueError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print 'Please enter time in hh:mma or hh:mmp format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
         except AttributeError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print 'Please enter time in hh:mma or hh:mmp format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
         except IndexError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print 'Please enter time in hh:mma or hh:mmp format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
 
     return time
 
@@ -326,10 +244,7 @@ class Day:
         self.shiftDecDict = dict(self.shiftDecList)
 #    def editShift(self):
     def viewShift(self):
-        x = 1
-        for shift in self.shiftRegDict:
-            print 'Shift ' + str(x) + ': ' + shift + ' - ' + self.shiftRegDict[shift]
-            x += 1
+        return self.shiftRegDict
 
 class TM:
     '''
@@ -400,18 +315,14 @@ dayDict = {Monday:'Monday', Tuesday:'Tuesday', Wednesday:'Wednesday', Thursday:'
 
 #get shift data for each day
 for day in dayList:
-    print '================================================'
     shiftNum = CheckInt(raw_input('How many shifts for ' + str(dayDict[day]) + '? \n \n'))
     x = 0
     while x < shiftNum:
-        print '------------------------------------------------'
-        start = FormatTime(raw_input('Enter the STARTING time of the ' + NumberIncrement(str(x+1)) + ' shift on ' + str(dayDict[day]) + ': \n \n'))
-        start = CheckTime(start)
-        print '------------------------------------------------'
-        end = FormatTime(raw_input('Enter the ENDING time of the ' + NumberIncrement(str(x+1)) + ' shift on ' + str(dayDict[day]) + ': \n \n' + start + ' - '))
-        end = CheckTime(end)
+        start = FormatTime(raw_input('Enter the start time of shift ' + str(x+1) + ' on ' + str(dayDict[day]) + ': \n \n'))
+        CheckTime(start)
+        end = FormatTime(raw_input('Enter the end time of shift' + str(x+1) + ' on ' + str(dayDict[day]) + ': \n \n'))
+        CheckTime(end)
         day.addShift(start, end)
-        print '\nAdded Shift \nShifts for ' + str(dayDict[day]) + ': \n'
         day.viewShift()
         x += 1
 
@@ -421,15 +332,12 @@ printable names for all the employees
 '''
 tmDict = {}
 tmList = []
-print '------------------------------------------------'
 tmNum = CheckInt(raw_input('How many employees are you staffing? \n \n'))
 
 #make a class for each tm and a add a corresponding name
 x = 0
 while x < tmNum:
-    print '------------------------------------------------'
-    name = raw_input('What is the name of your ' + NumberIncrement((x+1)) + ' employee? \n \n')
-    print '------------------------------------------------'
+    name = raw_input('What is the name of employee number %i? \n \n'%(x+1))
     tmHours = CheckInt(raw_input('How many hours can %s work? \n \n'%name))
     classname = name
     classname = TM(tmHours)
@@ -440,7 +348,6 @@ while x < tmNum:
 # add days off to tm.blackList
 for tm in tmList:
     while True:
-        print '------------------------------------------------'
         blacklist = raw_input("What days can't %s work? (press enter to skip ) \n \n"%tmDict[tm]).lower()
         if blacklist in dayPrintDict:
             tm.blacklist(blacklist, dayPrintDict[blacklist])
@@ -463,8 +370,6 @@ the list.
 an error message is printed.
 '''
 
-print 'Assigning shifts...'
-unassignedString = ''
 for day in dayDict:
     for shift in day.shiftDecDict:
         numList = []
@@ -474,7 +379,9 @@ for day in dayDict:
         x = 0
         while True:
             if x >= len(numList):
-                unassignedString += str(dayDict[day]) + '  ' +  str(DectoTime(shift)) + '-' + str(DectoTime(day.shiftDecDict[shift])) + '\n'
+                print 'Following shift could not be assigned:'
+                print dayDict[day],
+                print str(DectoTime(shift)) + '-' + str(DectoTime(day.shiftDecDict[shift]))
                 unassigned.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
                 break
             else:
@@ -484,8 +391,7 @@ for day in dayDict:
                 break
             else:
                 x += 1
-print 'Following shift(s) could not be assigned:'
-print unassignedString
+
 #Excel printing
 
 workbook = xlwt.Workbook()
