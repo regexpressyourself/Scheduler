@@ -18,7 +18,7 @@ TO DO
     [x]make timeinput more lenient in general
     [ ]make all input more lenient in general
     [ ]focus on user experience - could a toddler do it?
-    [ ]on time input, make it more clear what shift you're adding to 
+    [ ]on time input, make it more clear what shift you're adding to
     [ ]check all raw_inputs for new line on answer. also add new line after the answer
     [ ]check if end time is later than start time
     [ ]run some checks on the time math
@@ -91,10 +91,10 @@ def DectoTime(dec):
 def FormatTime(time):
     '''
     Sanitize different time inputs to fit the hh:mma/hh:mmp format needed for
-    conversion between decimal value and readable time value. The goal here 
+    conversion between decimal value and readable time value. The goal here
     is to make the time input a little more intuitive.
 
-    NOTE: CheckInput does a final check in a loop, giving the user a chance to 
+    NOTE: CheckInput does a final check in a loop, giving the user a chance to
     revise input. FormatTime is meant to fix common input errors for the user.
     Hopefully, it makes things a little easier.
     '''
@@ -117,10 +117,10 @@ def FormatTime(time):
                 while True:
                     flag = raw_input('Did you mean 0' + time[:-1] + ':00' + time[-1] + '? (y or n)\t')
                     if flag == '':
-                        time = '0' + time[:-1] + ':00' + time[-1] 
+                        time = '0' + time[:-1] + ':00' + time[-1]
                         break
                     elif flag in 'Yy':
-                        time = '0' + time[:-1] + ':00' + time[-1] 
+                        time = '0' + time[:-1] + ':00' + time[-1]
                         break
                     elif flag in 'nN':
                         return False
@@ -132,10 +132,10 @@ def FormatTime(time):
                 while True:
                     flag = raw_input('Did you mean ' + time[:-1] + ':00' + time[-1] + '? (y or n)\t')
                     if flag == '':
-                        time = time[:-1] + ':00' + time[-1] 
+                        time = time[:-1] + ':00' + time[-1]
                         break
                     elif flag in 'Yy':
-                        time = time[:-1] + ':00' + time[-1] 
+                        time = time[:-1] + ':00' + time[-1]
                         break
                     elif flag in 'Nn':
                         return False
@@ -160,7 +160,7 @@ def FormatTime(time):
             if len(hour) == 1:
                 try:
                     int(hour)
-                    time = '0' + time 
+                    time = '0' + time
                 except ValueError:
                     return False
             minute = time.split(':')[1]
@@ -178,10 +178,10 @@ def FormatTime(time):
                 while True:
                     flag = raw_input('Did you mean 0' + time + ':00? (y or n)\t')
                     if flag == '':
-                        time = '0' + time + ':00' 
+                        time = '0' + time + ':00'
                         break
                     elif flag in 'Yy':
-                        time = '0' + time + ':00' 
+                        time = '0' + time + ':00'
                         break
                     elif flag in 'nN':
                         return False
@@ -197,10 +197,10 @@ def FormatTime(time):
                 while True:
                     flag = raw_input('Did you mean ' + time + ':00? (y or n)\t')
                     if flag == '':
-                        time = time + ':00' 
+                        time = time + ':00'
                         break
                     elif flag in 'Yy':
-                        time = time + ':00' 
+                        time = time + ':00'
                         break
                     elif flag in 'nN':
                         return False
@@ -376,6 +376,7 @@ class TM:
         self.blackList[day] = dayClass
 
 '''
+
 classify all the days
 '''
 Monday = Day()
