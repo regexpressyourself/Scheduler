@@ -1,3 +1,4 @@
+
 '''
 ------------
 TO DO
@@ -23,10 +24,11 @@ TO DO
     [ ]check all raw_inputs for new line on answer.
     [ ]also, with above, add new line after the answer
     [ ]check if end time is later than start time
-    [ ]run some checks on the time math
+    [ ]run some checks on the time math- round dectotime
     [ ]change the time confimation to the end of the time input.
     [ ]add method to day class to return string and replace the dayDict BS
-    [ ]allow user to edit shift after print
+    [x]allow user to edit shift after print
+    [ ]check overnight shifts
 '''
 
 #!/usr/bin/python2
@@ -66,7 +68,7 @@ def TimetoDec(time):
         if hour != 12:
             hour += 12.0
 
-    minute = minute/60.0
+    minute = round(minute/60.0, 2)
 
     return hour+minute
 
@@ -174,7 +176,9 @@ def FormatTime(time):
     if time:
         if time[-1] not in ['a', 'p']:
             while True:
-                print 'And was that AM or PM?',
+                print 'And was that AM or PM?'
+                print '(hint: put "a" or "p" at the end of your time to avoid this step)'
+
                 flag = raw_input(' (enter a for am or p for pm)\t')
                 if flag in ['a', 'am', 'AM', 'Am', 'aM']:
                     time = time + 'a'
@@ -206,47 +210,47 @@ def CheckTime(time):
                                 elif str((time.split(':')[1][2])) == 'p':
                                     break
                                 else:
-                                    print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                                    print '\nERROR: Please enter time in an approved format'
                                     time = FormatTime(raw_input('Please re-enter time: \n \n'))
                                     CheckTime(time)
                             else:
-                                print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                                print '\nERROR: Please enter time in an approved format'
                                 time = FormatTime(raw_input('Please re-enter time: \n \n'))
                                 CheckTime(time)
                         else:
-                            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                            print '\nERROR: Please enter time in an approved format'
                             time = FormatTime(raw_input('Please re-enter time: \n \n'))
                             CheckTime(time)
                     except IndexError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print '\nERROR: Please enter time in an approved format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
                         CheckTime(time)
                     except AttributeError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print '\nERROR: Please enter time in an approved format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
                         CheckTime(time)
                     except ValueError:
-                        print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                        print '\nERROR: Please enter time in an approved format'
                         time = FormatTime(raw_input('Please re-enter time: \n \n'))
                         CheckTime(time)
                 else:
-                    print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                    print '\nERROR: Please enter time in an approved format'
                     time = FormatTime(raw_input('Please re-enter time: \n \n'))
                     CheckTime(time)
             else:
-                print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+                print '\nERROR: Please enter time in an approved format'
                 time = FormatTime(raw_input('Please re-enter time: \n \n'))
                 CheckTime(time)
         except ValueError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print '\nERROR: Please enter time in an approved format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
             CheckTime(time)
         except AttributeError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print '\nERROR: Please enter time in an approved format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
             CheckTime(time)
         except IndexError:
-            print '\n ERROR: Please enter time in hh:mma or hh:mmp format'
+            print '\nERROR: Please enter time in an approved format'
             time = FormatTime(raw_input('Please re-enter time: \n \n'))
             CheckTime(time)
 
@@ -322,6 +326,8 @@ class TM:
 
     def canWork(self, day, strDay, start, end):
         shiftTime = end-start
+        if shiftTime < 0:
+            shiftTime += 24
         if self.totalTime + shiftTime <= self.maxHours:
             if day in self.shiftDict:
                 return False
@@ -333,7 +339,10 @@ class TM:
             return False
 
     def addShift(self, day, stringday, start, stop):
+
         shiftTime = stop-start
+        if shiftTime < 0:
+            shiftTime += 24
         try:
             self.shiftDict[day]
             self.shiftDict[day][start] = stop
@@ -489,7 +498,6 @@ while True:
             else:
                 print "\n**Sorry, I didn't get that**\n"
                 continue
-
 
     elif editOption == 'add':
         while True:
