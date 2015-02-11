@@ -397,24 +397,26 @@ dayDict = {Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday',
 # get shift data for each day
 for day in dayList:
     print '================================================'
+    dayVar = dayDict[day]
     shiftNum = CheckInt(raw_input('How many shifts for ' +
-                                  str(dayDict[day]) + '? \n \n'))
+                                  dayVar + '? \n \n'))
     x = 0
     while x < shiftNum:
         print '------------------------------------------------'
         start = FormatTime(raw_input('Enter the STARTING time of the ' +
                                      NumberIncrement(str(x+1)) + ' shift on ' +
-                                     str(dayDict[day]) + ': \n \n'))
+                                     dayVar + ": \n \n"))
         start = CheckTime(start)
         print '------------------------------------------------'
         end = FormatTime(raw_input('Enter the ENDING time of the ' +
                                    NumberIncrement(str(x+1)) + ' shift on ' +
-                                   str(dayDict[day]) + ': \n \n' + start + ' - '))
+                                   dayVar + ': \n \n' +
+                                   start + ' - '))
         end = CheckTime(end)
         day.addShift(start, end)
         print '\n--Added Shift-- \n\n'
         print '++++++++++++++++++++++++'
-        print 'Shifts for ' + str(dayDict[day]) + ': \n'
+        print 'Shifts for ' + dayVar + ': \n'
         day.viewShift()
         print '++++++++++++++++++++++++\n\n'
         x += 1
@@ -430,7 +432,8 @@ while True:
         print ''
     print '++++++++++++++++++++++++\n'
 
-    print 'You may now edit your shifts. If they look good, just press enter or',
+    print 'You may now edit your shifts. ',
+    print 'If they look good, just press enter or',
     print ' enter "done" and we can move on to your employees.'
     editOption = raw_input('edit | remove | add | done >> ')
     print '\n'
