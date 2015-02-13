@@ -321,6 +321,7 @@ class TM:
         self.maxHours = maxHours
         self.totalTime = 0
         self.blackList = {}
+        self.blackShiftDict = {}
         self.shiftDict = {}
         self.printShiftDict = {}
 
@@ -331,6 +332,10 @@ class TM:
         if self.totalTime + shiftTime <= self.maxHours:
             if day in self.shiftDict:
                 return False
+            elif strDay.lower() in self.blackShiftDict:
+                for time in self.blackShiftDict[strDay.lower()]:
+                    if start<time<end:
+                        return False
             elif strDay.lower() in self.blackList:
                 return False
             else:
@@ -363,6 +368,15 @@ class TM:
 
     def blacklist(self, day, dayClass):
         self.blackList[day] = dayClass
+
+    def shiftBlacklist(self, day, start, end):
+        try:
+            self.blackShiftDict[day]
+            self.blackShiftDict[day][start] = end
+        except:
+            self.blackShiftDict[day] = {start: end}
+
+
 
 '''
 
@@ -548,20 +562,43 @@ while x < tmNum:
     classname = TM(tmHours)
     tmList.append(classname)
     tmDict[classname] = name
-    x += 1
-
-# add days off to tm.blackList
-for tm in tmList:
     while True:
         print '------------------------------------------------'
-        blacklist = raw_input("What days can't %s work?" % tmDict[tm].lower() +
-                              " (press enter to skip) \n \n")
-        if blacklist in dayPrintDict:
-            tm.blacklist(blacklist, dayPrintDict[blacklist])
+        blacklist = raw_input("What days can't %s work?" % tmDict[classname].lower() +
+                              " (simply press enter when finished) \n")
+        if blacklist.lower() in dayPrintDict:
+            while True:
+                print ("\n\n****Is " + name + " available for part of " +
+                       blacklist + "?\n\n")
+                shiftCheck = raw_input("(In other words, is " + name +
+                                       " only unavailable for a portion of " + blacklist + ")\n\n")
+                if shiftCheck in ['y', 'yes', 'Yes', 'YEs', 'YES', 'Y']:
+                    print "-----------------------------------------------"
+                    shiftBlacklistStart = FormatTime(raw_input("Enter the starting time of " +
+                                                     name + "'s unavailability for " +
+                                                               blacklist + "\n\n"))
+                    shiftBlacklistStart = CheckTime(shiftBlacklistStart)
+                    print "-----------------------------------------------"
+                    shiftBlacklistEnd = FormatTime(raw_input("Enter the ending time of " +
+                                                   name + "'s unavailability for " +
+                                                   blacklist + "\n\n"))
+                    shiftBlacklistEnd = CheckTime(shiftBlacklistEnd)
+                    classname.shiftBlacklist(blacklist, shiftBlacklistStart, shiftBlacklistEnd)
+                    break
+
+                elif shiftCheck in ['n', 'no', 'No', 'NO', 'N']:
+                    classname.blacklist(blacklist, dayPrintDict[blacklist])
+                    break
+                else:
+                    print "Sorry, didn't get that."
+                    print "Enter yes if you'd like to add a specific time of unnavailability."
+                    print "Enter no if " + name + " is unavailable for the whole day. \n"
         elif blacklist == '':
             break
         else:
             print "Please enter a day, or press enter to finish \n \n"
+    x += 1
+
 
 # unassigned stores all the extra shifts (hence the huge "maxhour" number)
 unassigned = TM(999999999999999999999999999999999)
