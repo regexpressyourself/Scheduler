@@ -30,7 +30,9 @@ TO DO
     [x]allow user to edit shift after print
     [x]check overnight shifts
     [ ]
+    [ ]Unavailable for shift unavailibility as well as day unavailability
     [ ]add additional excel outputs
+    [ ]"are there any OTHER days tm cant work?"
     [x]check that time off on a day doesnt conflict on either side
     [x]what days cant they work input needs work
 '''
@@ -584,10 +586,10 @@ while x < tmNum:
                     break
                 else:
                     print "***Sorry, didn't get that.***"
-                    print ("Enter yes if you'd like to add a specific time " +
-                           "of unnavailability.")
-                    print ("Enter no if " + name + " is unavailable for " +
-                           "the whole day. \n")
+                    print ("Enter yes if " + name + " is not available for " +
+                           "the whole day)")
+                    print ("Enter no if " + name + " is available for " +
+                           "just a part of the day. \n")
         elif blacklist in ['0', 'none', 'no', 'n', 'done']:
             break
         elif blacklist == '':
@@ -706,8 +708,9 @@ for tm in tmList:
                               (dayList.index(day)*3)+5, '', notop)
             y += 2
     for day in tm.blackList:
-        sheet.write(x, dayList.index(tm.blackList[day])+1,
-                    'Not Available', grey)
+        sheet.write_merge(x, x+1, (dayList.index(tm.blackList[day])*3)+3,
+                          (dayList.index(tm.blackList[day])*3)+5,
+                          'Not Available', grey)
     sheet.write_merge(x, x+1, 24, 24, tm.totalTime, thick)
     x += 2
 
