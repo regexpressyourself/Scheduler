@@ -6,7 +6,7 @@ TO DO
     [x]random assignment of shifts to employees
     [x]does not go over hours alloted for each TM
     [x]does not interfere with TM day off requests
-    [ ]does not interfere with TM shift off requests
+    [x]does not interfere with TM shift off requests
     [ ]if possible, avoid clopens
     [ ]change inputs for day off inputs
     [ ]comment out code
@@ -20,15 +20,19 @@ TO DO
     [x]make timeinput more lenient in general
     [x]make all input more lenient in general
     [ ]focus on user experience - could a toddler do it?
-    [ ]on time input, make it more clear what shift you're adding to
+    [x]on time input, make it more clear what shift you're adding to
     [ ]check all raw_inputs for new line on answer.
     [ ]also, with above, add new line after the answer
     [ ]check if end time is later than start time
-    [ ]run some checks on the time math- round dectotime
-    [ ]change the time confimation to the end of the time input.
+    [x]run some checks on the time math- round dectotime
+    [x]change the time confimation to the end of the time input.
     [ ]add method to day class to return string and replace the dayDict BS
     [x]allow user to edit shift after print
-    [ ]check overnight shifts
+    [x]check overnight shifts
+    [ ]
+    [ ]add additional excel outputs
+    [x]check that time off on a day doesnt conflict on either side
+    [x]what days cant they work input needs work
 '''
 
 #!/usr/bin/python2
@@ -177,7 +181,8 @@ def FormatTime(time):
         if time[-1] not in ['a', 'p']:
             while True:
                 print 'And was that AM or PM?'
-                print '(hint: put "a" or "p" at the end of your time to avoid this step)'
+                print ('(hint: put "a" or "p" at the end of your time ' +
+                       'to avoid this step)')
 
                 flag = raw_input(' (enter a for am or p for pm)\t')
                 if flag in ['a', 'am', 'AM', 'Am', 'aM']:
@@ -193,6 +198,11 @@ def FormatTime(time):
 
 
 def CheckTime(time):
+    def ErrorMessage():
+        print '\nERROR: Please enter time in an approved format'
+        newtime = FormatTime(raw_input('Please re-enter time: \n \n'))
+        CheckTime(newtime)
+        return newtime
     '''
     checks that time is entered in the format "hh:mma" or "hh:mmp"
     '''
@@ -210,49 +220,27 @@ def CheckTime(time):
                                 elif str((time.split(':')[1][2])) == 'p':
                                     break
                                 else:
-                                    print '\nERROR: Please enter time in an approved format'
-                                    time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                                    CheckTime(time)
+                                    time = ErrorMessage()
                             else:
-                                print '\nERROR: Please enter time in an approved format'
-                                time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                                CheckTime(time)
+                                time = ErrorMessage()
                         else:
-                            print '\nERROR: Please enter time in an approved format'
-                            time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                            CheckTime(time)
+                            time = ErrorMessage()
                     except IndexError:
-                        print '\nERROR: Please enter time in an approved format'
-                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
+                        time = ErrorMessage()
                     except AttributeError:
-                        print '\nERROR: Please enter time in an approved format'
-                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
+                        time = ErrorMessage()
                     except ValueError:
-                        print '\nERROR: Please enter time in an approved format'
-                        time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                        CheckTime(time)
+                        time = ErrorMessage()
                 else:
-                    print '\nERROR: Please enter time in an approved format'
-                    time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                    CheckTime(time)
+                    time = ErrorMessage()
             else:
-                print '\nERROR: Please enter time in an approved format'
-                time = FormatTime(raw_input('Please re-enter time: \n \n'))
-                CheckTime(time)
+                time = ErrorMessage()
         except ValueError:
-            print '\nERROR: Please enter time in an approved format'
-            time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
+            time = ErrorMessage()
         except AttributeError:
-            print '\nERROR: Please enter time in an approved format'
-            time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
+            time = ErrorMessage()
         except IndexError:
-            print '\nERROR: Please enter time in an approved format'
-            time = FormatTime(raw_input('Please re-enter time: \n \n'))
-            CheckTime(time)
+            time = ErrorMessage()
 
     return time
 
@@ -306,7 +294,8 @@ class Day:
     def viewShift(self):
         x = 1
         for shift in self.shiftRegDict:
-            viewTime = self.shiftRegList[x-1][0] + ' - ' + self.shiftRegList[x-1][1]
+            viewTime = (self.shiftRegList[x-1][0] + ' - ' +
+                        self.shiftRegList[x-1][1])
             print 'Shift ' + str(x) + ': ' + viewTime
             x += 1
 
@@ -334,7 +323,7 @@ class TM:
                 return False
             elif strDay.lower() in self.blackShiftDict:
                 for time in self.blackShiftDict[strDay.lower()]:
-                    if start<time<end:
+                    if start < time < end:
                         return False
             elif strDay.lower() in self.blackList:
                 return False
@@ -470,13 +459,15 @@ while True:
                         print "\n**Sorry, I didn't get that**\n"
                         continue
                     if shiftIndex in range(0, len(editDay.shiftRegDict)+1):
-                        print '------------------------------------------------'
-                        newStart = FormatTime(raw_input('Enter the new STARTING time of' +
-                                                        ' shift ' + str(shiftIndex) + '\n\n'))
+                        print '-----------------------------------------------'
+                        inqueryString = ('Enter the new STARTING time of ' +
+                                         'shift ' + str(shiftIndex) + '\n\n')
+                        newStart = FormatTime(raw_input(inqueryString))
                         newStart = CheckTime(newStart)
-                        print '------------------------------------------------'
-                        newEnd = FormatTime(raw_input('Enter the new ENDING time of' +
-                                                    ' shift ' + str(shiftIndex)  + '\n\n'))
+                        print '-----------------------------------------------'
+                        inqueryString = ('Enter the new ENDING time of ' +
+                                         'shift ' + str(shiftIndex) + '\n\n')
+                        newEnd = FormatTime(raw_input(inqueryString))
                         newEnd = CheckTime(newEnd)
                         editDay.editShift(shiftIndex-1, newStart, newEnd)
                         break
@@ -523,12 +514,12 @@ while True:
             if editDay in dayPrintDict:
                 editDay = dayPrintDict[editDay]
                 print '------------------------------------------------'
-                newStart = FormatTime(raw_input('Enter the new STARTING time of' +
-                                                ' your new shift \n\n'))
+                newStart = FormatTime(raw_input('Enter the new STARTING time' +
+                                                ' of your new shift \n\n'))
                 newStart = CheckTime(newStart)
                 print '------------------------------------------------'
                 newEnd = FormatTime(raw_input('Enter the new ENDING time of' +
-                                            ' your new shift \n\n'))
+                                              ' your new shift \n\n'))
                 newEnd = CheckTime(newEnd)
                 editDay.addShift(newStart, newEnd)
                 break
@@ -564,35 +555,41 @@ while x < tmNum:
     tmDict[classname] = name
     while True:
         print '------------------------------------------------'
-        blacklist = raw_input("What days can't %s work?" % tmDict[classname].lower() +
+        blacklist = raw_input("What days can't %s work?"
+                              % tmDict[classname].lower() +
                               " (simply press enter when finished) \n")
         if blacklist.lower() in dayPrintDict:
             while True:
-                print ("\n\n****Is " + name + " available for part of " +
-                       blacklist + "?\n\n")
-                shiftCheck = raw_input("(In other words, is " + name +
-                                       " only unavailable for a portion of " + blacklist + ")\n\n")
-                if shiftCheck in ['y', 'yes', 'Yes', 'YEs', 'YES', 'Y']:
+                shiftCheck = raw_input("\n\n****Is " + name + " unavailable " +
+                                       "for all of " + blacklist + "?\n\n")
+                if shiftCheck in ['n', 'no', 'No', 'NO', 'N']:
                     print "-----------------------------------------------"
-                    shiftBlacklistStart = FormatTime(raw_input("Enter the starting time of " +
-                                                     name + "'s unavailability for " +
-                                                               blacklist + "\n\n"))
+                    inqueryString = ("Enter the STARTING time of " + name +
+                                     "'s" + " unavailability for " +
+                                     blacklist + "\n\n")
+                    shiftBlacklistStart = FormatTime(raw_input(inqueryString))
                     shiftBlacklistStart = CheckTime(shiftBlacklistStart)
                     print "-----------------------------------------------"
-                    shiftBlacklistEnd = FormatTime(raw_input("Enter the ending time of " +
-                                                   name + "'s unavailability for " +
-                                                   blacklist + "\n\n"))
+                    inqueryString = ("Enter the ENDING time of " + name +
+                                     "'s" + " unavailability for " +
+                                     blacklist + "\n\n")
+                    shiftBlacklistEnd = FormatTime(raw_input(inqueryString))
                     shiftBlacklistEnd = CheckTime(shiftBlacklistEnd)
-                    classname.shiftBlacklist(blacklist, shiftBlacklistStart, shiftBlacklistEnd)
+                    classname.shiftBlacklist(blacklist, shiftBlacklistStart,
+                                             shiftBlacklistEnd)
                     break
 
-                elif shiftCheck in ['n', 'no', 'No', 'NO', 'N']:
+                elif shiftCheck in ['y', 'yes', 'Yes', 'YEs', 'YES', 'Y']:
                     classname.blacklist(blacklist, dayPrintDict[blacklist])
                     break
                 else:
-                    print "Sorry, didn't get that."
-                    print "Enter yes if you'd like to add a specific time of unnavailability."
-                    print "Enter no if " + name + " is unavailable for the whole day. \n"
+                    print "***Sorry, didn't get that.***"
+                    print ("Enter yes if you'd like to add a specific time " +
+                           "of unnavailability.")
+                    print ("Enter no if " + name + " is unavailable for " +
+                           "the whole day. \n")
+        elif blacklist in ['0', 'none', 'no', 'n', 'done']:
+            break
         elif blacklist == '':
             break
         else:
@@ -627,37 +624,63 @@ for day in dayDict:
             if x >= len(numList):
                 unassignedString += str(dayDict[day]) + '  '
                 unassignedString += str(DectoTime(shift)) + '-'
-                unassignedString += str(DectoTime(day.shiftDecDict[shift])) + '\n'
-                unassigned.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
+                unassignedString += (str(DectoTime(day.shiftDecDict[shift])) +
+                                     '\n')
+                unassigned.addShift(day, dayDict[day], shift,
+                                    day.shiftDecDict[shift])
                 break
             else:
                 shiftTM = tmList[numList[x]]
-            if shiftTM.canWork(day, dayDict[day], shift, day.shiftDecDict[shift]):
-                shiftTM.addShift(day, dayDict[day], shift, day.shiftDecDict[shift])
+            if shiftTM.canWork(day, dayDict[day], shift,
+                               day.shiftDecDict[shift]):
+                shiftTM.addShift(day, dayDict[day], shift,
+                                 day.shiftDecDict[shift])
                 break
             else:
                 x += 1
-print 'Following shift(s) could not be assigned:'
-print unassignedString
-# Excel printing
 
+if len(unassignedString) > 0:
+    print 'Following shift(s) could not be assigned:'
+    print unassignedString
+print 'Done! Your schedule can be found in the same directory as this program.'
+print 'Look for schedule.xls'
+
+# Excel printing
+# the next 30 lines or so just make a template for the cells to work with.
 workbook = xlwt.Workbook()
 sheet = workbook.add_sheet('Schedule')
 
-grey = xlwt.easyxf('align: horiz center, vert center; pattern: pattern solid; borders: bottom thick, top thick, left thick, right thick')
+tempString = ("align: horiz center, vert center; pattern: pattern solid; " +
+              "borders: bottom thick, top thick, left thick, right thick")
+grey = xlwt.easyxf(tempString)
 grey.pattern.pattern_fore_colour = 22
 
-bold = xlwt.easyxf("font: bold on; borders: bottom thick, top thick, left thick, right thick")
-boldcenter = xlwt.easyxf("font: bold on; align: horiz center, vert center; borders: bottom thick, top thick, left thick, right thick")
+tempString = ("font: bold on; borders: bottom thick, top thick, " +
+              "left thick, right thick")
+bold = xlwt.easyxf(tempString)
 
-left = xlwt.easyxf('align: horiz center; borders: left thick, top thick, right no_line, bottom no_line')
-right = xlwt.easyxf('align: horiz center; borders: top thick, right thick, bottom no_line, left no_line')
-center = xlwt.easyxf('align: horiz center; borders: top thick, bottom no_line, right no_line, left no_line')
+tempString = ("font: bold on; align: horiz center, vert center; " +
+              "borders: bottom thick, top thick, left thick, right thick")
+boldcenter = xlwt.easyxf(tempString)
 
-thick = xlwt.easyxf('borders: bottom thick, top thick, left thick, right thick')
+tempString = ("align: horiz center; borders: left thick, top thick, " +
+              "right no_line, bottom no_line")
+left = xlwt.easyxf(tempString)
 
+tempString = ("align: horiz center; borders: top thick, right thick, " +
+              "bottom no_line, left no_line")
+right = xlwt.easyxf(tempString)
+
+tempString = ("align: horiz center; borders: top thick, bottom no_line, " +
+              "right no_line, left no_line")
+center = xlwt.easyxf(tempString)
+
+tempString = ("borders: bottom thick, top thick, left thick, right thick")
+
+thick = xlwt.easyxf(tempString)
 notop = xlwt.easyxf('borders: bottom thick, left thick, right thick')
 
+# Onto the actual data input for excel
 x = 3
 y = 0
 while x < len(dayList)*3+3:
@@ -677,11 +700,14 @@ for tm in tmList:
         for shift in tm.printShiftDict[day]:
             sheet.write(x+y, (dayList.index(day)*3)+3, shift, left)
             sheet.write(x+y, (dayList.index(day)*3)+4, '-', center)
-            sheet.write(x+y, (dayList.index(day)*3)+5, tm.printShiftDict[day][shift], right)
-            sheet.write_merge(x+y+1, x+y+1, (dayList.index(day)*3)+3, (dayList.index(day)*3)+5, '', notop)
+            sheet.write(x+y, (dayList.index(day)*3)+5,
+                        tm.printShiftDict[day][shift], right)
+            sheet.write_merge(x+y+1, x+y+1, (dayList.index(day)*3)+3,
+                              (dayList.index(day)*3)+5, '', notop)
             y += 2
     for day in tm.blackList:
-        sheet.write(x, dayList.index(tm.blackList[day])+1, 'Not Available', grey)
+        sheet.write(x, dayList.index(tm.blackList[day])+1,
+                    'Not Available', grey)
     sheet.write_merge(x, x+1, 24, 24, tm.totalTime, thick)
     x += 2
 

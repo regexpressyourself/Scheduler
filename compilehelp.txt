@@ -1,3 +1,0 @@
-1. Copy Scheduler.py to this directory
-2. python setup.py build
-3. .exe should be available
