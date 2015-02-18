@@ -367,10 +367,7 @@ class TM:
         except:
             self.blackShiftDict[day] = {start: end}
 
-
-
 '''
-
 classify all the days
 '''
 Monday = Day()
@@ -557,9 +554,14 @@ while x < tmNum:
     tmDict[classname] = name
     while True:
         print '------------------------------------------------'
-        blacklist = raw_input("What days can't %s work?"
-                              % tmDict[classname].lower() +
-                              " (simply press enter when finished) \n")
+        if len(classname.blackList) + len(classname.blackShiftDict) == 0:
+            blacklist = raw_input("What days can't %s work?"
+                                  % tmDict[classname].lower() +
+                                  " (press enter if none) \n")
+        else:
+            blacklist = raw_input("Are there any other days %s can't work?"
+                                  % tmDict[classname].lower() +
+                                  " (simply press enter when finished) \n")
         if blacklist.lower() in dayPrintDict:
             while True:
                 shiftCheck = raw_input("\n\n****Is " + name + " unavailable " +
