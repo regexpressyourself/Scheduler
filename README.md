@@ -32,7 +32,7 @@ excel schedule is produced which you are free to manipulate to your will.
 
 To run the app from the source, you must have 
 [python 2.7](www.python.org/downloads) and the [xlwt](pypi.python.org/pypi/xlwt) 
-library. I have also packaged the app up into a .exe using [py2exe](www.py2exe.org),
+library. I have also packaged the app up into a .exe using [pyinstaller](www.pyinstaller.org),
 which you can simply download and run, if that's easier. Scheduler will output 
 your .xls file in the same directory as the program itself. Look for "schedule.xls".
 
@@ -41,8 +41,8 @@ walked through the week and asked for how many shifts in a given day, along with
 the shift times. The times can take most any format, and will let you know if
 they are unreadable. I recommend 9a, or 9:30a for 9:00 AM and 9:30 AM, respectively.
 
-After times are taken down, the app asks for the names, total hours, and days off
-of each employee. 
+After times are taken down, the app asks for the names, total hours, shifts off, 
+and days off for each employee. 
 
 The app will log any unassigned shift at the bottom of the schedule, under 
 "unassigned." You are free to adjust these shifts according to your need. It's 
