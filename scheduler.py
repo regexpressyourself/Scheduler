@@ -1,4 +1,3 @@
-
 '''
 ------------
 TO DO
@@ -7,40 +6,40 @@ TO DO
     [x]does not go over hours alloted for each TM
     [x]does not interfere with TM day off requests
     [x]does not interfere with TM shift off requests
-    [ ]if possible, avoid clopens
-    [ ]change inputs for day off inputs
-    [ ]comment out code
     [x]refine excel worksheet- colors, bold, data manipulation, etc
-    [ ]add shift preference
-    [ ]get off cli
     [x]fix day off user input
-
     [x]check if time is 1-12
     [x]Add IndexError exception for "10" input on time
     [x]make timeinput more lenient in general
     [x]make all input more lenient in general
-    [ ]focus on user experience - could a toddler do it?
     [x]on time input, make it more clear what shift you're adding to
-    [ ]check all raw_inputs for new line on answer.
-    [ ]also, with above, add new line after the answer
-    [ ]check if end time is later than start time
+    [x]check if end time is later than start time
     [x]run some checks on the time math- round dectotime
     [x]change the time confimation to the end of the time input.
-    [ ]add method to day class to return string and replace the dayDict BS
+    [x]add method to day class to return string and replace the dayDict BS
     [x]allow user to edit shift after print
     [x]check overnight shifts
-    [ ]
-    [ ]Unavailable for shift unavailibility as well as day unavailability
-    [ ]add additional excel outputs
-    [ ]"are there any OTHER days tm cant work?"
+    [x]"are there any OTHER days tm cant work?"
     [x]check that time off on a day doesnt conflict on either side
     [x]what days cant they work input needs work
+    [kindof]Unavailable for shift unavailibility as well as day unavailability
+    [ ]add shift preference
+    [ ]get off cli
+    [ ]focus on user experience - could a toddler do it?
+    [ ]check all raw_inputs for new line on answer.
+    [ ]also, with above, add new line after the answer
+    [ ]if possible, avoid clopens
+    [ ]change inputs for day off inputs
+    [ ]comment out code
+    [ ]add additional excel outputs
+    [ ]
 '''
 
 #!/usr/bin/python2
 
 import random
 import xlwt
+
 print '\n\n\n'
 print '################################################################'
 print '                 Welcome to my scheduling app!                  '
@@ -70,6 +69,11 @@ def TimetoDec(time):
     minute = float(time.split(':')[1][:2])
     ampm = str(time.split(':')[1][2])
 
+    if hour == 12:
+        if ampm == 'p':
+            hour = 12
+        elif ampm == 'a':
+            hour == 0
     if ampm == 'p':
         if hour != 12:
             hour += 12.0
@@ -404,18 +408,28 @@ for day in dayList:
                                   dayVar + '? \n \n'))
     x = 0
     while x < shiftNum:
-        print '------------------------------------------------'
-        start = FormatTime(raw_input('Enter the STARTING time of the ' +
-                                     NumberIncrement(str(x+1)) + ' shift on ' +
-                                     dayVar + ": \n \n"))
-        start = CheckTime(start)
-        print '------------------------------------------------'
-        end = FormatTime(raw_input('Enter the ENDING time of the ' +
-                                   NumberIncrement(str(x+1)) + ' shift on ' +
-                                   dayVar + ': \n \n' +
-                                   start + ' - '))
-        end = CheckTime(end)
-        day.addShift(start, end)
+        while True:
+            print '------------------------------------------------'
+            start = FormatTime(raw_input('Enter the STARTING time of the ' +
+                                         NumberIncrement(str(x+1)) +
+                                         ' shift on ' + dayVar + ": \n \n"))
+            start = CheckTime(start)
+            print '------------------------------------------------'
+            end = FormatTime(raw_input('Enter the ENDING time of the ' +
+                                       NumberIncrement(str(x+1)) +
+                                       ' shift on ' + dayVar + ': \n \n' +
+                                       start + ' - '))
+            end = CheckTime(end)
+
+            if TimetoDec(end) - TimetoDec(start) < 0:
+                print "That's either an overnight shift or a mistake."
+                validate = raw_input("Do you want to keep it as is?\n\n")
+                if validate.lower() in ['yes', '', 'y', 'ye']:
+                    day.addShift(start, end)
+                    break
+                else:
+                    print "Ok, Let's try this again. \n"
+                    pass
         print '\n--Added Shift-- \n\n'
         print '++++++++++++++++++++++++'
         print 'Shifts for ' + dayVar + ': \n'
