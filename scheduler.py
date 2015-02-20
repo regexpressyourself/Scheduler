@@ -32,6 +32,8 @@ TO DO
     [ ]change inputs for day off inputs
     [ ]comment out code
     [ ]add additional excel outputs
+    [ ]add negative time check to edit and add shift options
+    [ ]add functions for a lot of stuff. make it better!!
     [ ]
 '''
 
@@ -430,6 +432,9 @@ for day in dayList:
                 else:
                     print "Ok, Let's try this again. \n"
                     pass
+            else:
+                day.addShift(start, end)
+                break
         print '\n--Added Shift-- \n\n'
         print '++++++++++++++++++++++++'
         print 'Shifts for ' + dayVar + ': \n'
@@ -472,6 +477,7 @@ while True:
                         print "\n**Sorry, I didn't get that**\n"
                         continue
                     if shiftIndex in range(0, len(editDay.shiftRegDict)+1):
+                    while True:
                         print '-----------------------------------------------'
                         inqueryString = ('Enter the new STARTING time of ' +
                                          'shift ' + str(shiftIndex) + '\n\n')
@@ -482,8 +488,19 @@ while True:
                                          'shift ' + str(shiftIndex) + '\n\n')
                         newEnd = FormatTime(raw_input(inqueryString))
                         newEnd = CheckTime(newEnd)
-                        editDay.editShift(shiftIndex-1, newStart, newEnd)
-                        break
+                        if TimetoDec(newEnd) - TimetoDec(newStart) < 0:
+                            print "That's either an overnight shift or a mistake."
+                            validate = raw_input("Do you want to keep it as is?\n\n")
+                            if validate.lower() in ['yes', '', 'y', 'ye']:
+                                editDay.editShift(shiftIndex-1, newStart, newEnd)
+                                break
+                            else:
+                                print "Ok, Let's try this again. \n"
+                                pass
+                        else:
+                            editDay.editShift(shiftIndex-1, newStart, newEnd)
+                            break
+                    break
                     else:
                         print "\n**Sorry, I didn't get that**\n"
                         continue
@@ -526,15 +543,29 @@ while True:
             editDay = editDay.lower()
             if editDay in dayPrintDict:
                 editDay = dayPrintDict[editDay]
-                print '------------------------------------------------'
-                newStart = FormatTime(raw_input('Enter the new STARTING time' +
-                                                ' of your new shift \n\n'))
-                newStart = CheckTime(newStart)
-                print '------------------------------------------------'
-                newEnd = FormatTime(raw_input('Enter the new ENDING time of' +
-                                              ' your new shift \n\n'))
-                newEnd = CheckTime(newEnd)
-                editDay.addShift(newStart, newEnd)
+                while True:
+                    print '-----------------------------------------------'
+                    inqueryString = ('Enter the new STARTING time of ' +
+                                     'shift ' + str(shiftIndex) + '\n\n')
+                    newStart = FormatTime(raw_input(inqueryString))
+                    newStart = CheckTime(newStart)
+                    print '-----------------------------------------------'
+                    inqueryString = ('Enter the new ENDING time of ' +
+                                     'shift ' + str(shiftIndex) + '\n\n')
+                    newEnd = FormatTime(raw_input(inqueryString))
+                    newEnd = CheckTime(newEnd)
+                    if TimetoDec(newEnd) - TimetoDec(newStart) < 0:
+                        print "That's either an overnight shift or a mistake."
+                        validate = raw_input("Do you want to keep it as is?\n\n")
+                        if validate.lower() in ['yes', '', 'y', 'ye']:
+                            editDay.editShift(shiftIndex-1, newStart, newEnd)
+                            break
+                        else:
+                            print "Ok, Let's try this again. \n"
+                            pass
+                    else:
+                        editDay.editShift(shiftIndex-1, newStart, newEnd)
+                        break
                 break
             else:
                 print "\n**Sorry, I didn't get that**\n"
@@ -735,16 +766,16 @@ while x < len(tmList)*2+1:
     sheet.write_merge(x, x+1, 2, 2, '', thick)
     x += 2
 
-y = 1
-while y <= len(tmList)*2:
-    x = 1
-    while x <= len(dayList)*3+3:
+x = 1
+while x <= len(tmList)*2:
+    y = 1
+    while y <= len(dayList)*3+3:
         try:
-            sheet.write_merge(y, y+1, x, x+2, 'OFF', grey)
+            sheet.write_merge(x, x+1, y, y+2, 'OFF', grey)
         except:
             pass
-        x += 1
-    y += 1
+        y += 1
+    x += 1
 
 
 workbook.save('schedule.xls')
