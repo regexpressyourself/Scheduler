@@ -52,6 +52,9 @@ print "\nNow let's get started\n\n"
 
 
 def NumberIncrement(number):
+    '''
+    Ability to print 1st, 2nd, 3rd, etc
+    '''
     if number in [1, '1']:
         return str(number) + 'st'
     elif number in [2, '2']:
@@ -206,14 +209,18 @@ def FormatTime(time):
 
 
 def CheckTime(time):
+    '''
+    Checks that time is entered in the format "hh:mma" or "hh:mmp" after
+    FormatTime has done its best to format it correctly.
+    '''
     def ErrorMessage():
+        '''
+        On all exceptions, print an error message
+        '''
         print '\nERROR: Please enter time in an approved format'
         newtime = FormatTime(raw_input('Please re-enter time: \n \n'))
         CheckTime(newtime)
         return newtime
-    '''
-    checks that time is entered in the format "hh:mma" or "hh:mmp"
-    '''
     while True:
         try:
             float(time.split(':')[0])
@@ -249,13 +256,11 @@ def CheckTime(time):
             time = ErrorMessage()
         except IndexError:
             time = ErrorMessage()
-
     return time
-
 
 def CheckInt(num):
     '''
-    Checks that number is integer
+    Checks that number is integer.
     '''
     while True:
         try:
@@ -274,19 +279,19 @@ class Day:
     Times are maintained in both decimal and regular form.
     '''
     def __init__(self):
+        # {startTime:endTime} for each shift, all in hh:mma format
         self.shiftRegDict = {}
+        # [(startTime, endTime)] for each shift
         self.shiftRegList = []
+        # Same as shiftRegDict, but with numbers instead of hh:mma format
         self.shiftDecDict = {}
+        # Same as shiftRegList, but with numbers instead of hh:mma format
         self.shiftDecList = []
 
-    def addShift(self, start, end):
-        self.shiftRegList.append((start, end))  # list of shift in normal form
+    def addShift(self, startShift, endShift):
+        self.shiftRegList.append((startShift, endShift))
         self.shiftRegDict = dict(self.shiftRegList)
-        # also in normal form, {start:end}
-
-        self.shiftDecList.append((TimetoDec(start), TimetoDec(end)))
-        # List of times in decimal form
-
+        self.shiftDecList.append((TimetoDec(startShift), TimetoDec(endShift)))
         self.shiftDecDict = dict(self.shiftDecList)
 
     def removeShift(self, shiftIndex):
@@ -317,44 +322,44 @@ class TM:
     def __init__(self, maxHours):
         self.maxHours = maxHours
         self.totalTime = 0
-        self.blackList = {}
-        self.blackShiftDict = {}
+        self.dayOffStrToClass = {}
+        self.shiftOffDict = {}
         self.shiftDict = {}
         self.printShiftDict = {}
 
-    def canWork(self, day, strDay, start, end):
-        shiftTime = end-start
+    def canWork(self, day, strDay, startShift, endShift):
+        shiftTime = endShift-startShift
         if shiftTime < 0:
             shiftTime += 24
         if self.totalTime + shiftTime <= self.maxHours:
             if day in self.shiftDict:
                 return False
-            elif strDay.lower() in self.blackShiftDict:
-                for time in self.blackShiftDict[strDay.lower()]:
-                    if start < time < end:
+            elif strDay.lower() in self.shiftOffDict:
+                for time in self.shiftOffDict[strDay.lower()]:
+                    if startShift < time < endShift:
                         return False
-            elif strDay.lower() in self.blackList:
+            elif strDay.lower() in self.dayOffStrToClass:
                 return False
             else:
                 return True
         else:
             return False
 
-    def addShift(self, day, stringday, start, stop):
+    def addShift(self, day, stringday, startShift, endShift):
 
-        shiftTime = stop-start
+        shiftTime = endShift-startShift
         if shiftTime < 0:
             shiftTime += 24
         try:
             self.shiftDict[day]
-            self.shiftDict[day][start] = stop
+            self.shiftDict[day][startShift] = endShift
         except:
-            self.shiftDict[day] = {start: stop}
+            self.shiftDict[day] = {startShift: endShift}
         try:
             self.printShiftDict[day]
-            self.printShiftDict[day][DectoTime(start)] = DectoTime(stop)
+            self.printShiftDict[day][DectoTime(startShift)] = DectoTime(endShift)
         except:
-            self.printShiftDict[day] = {DectoTime(start): DectoTime(stop)}
+            self.printShiftDict[day] = {DectoTime(startShift): DectoTime(endShift)}
         self.totalTime += shiftTime
 
     def maxHours(self, newShift):
@@ -363,15 +368,15 @@ class TM:
         elif self.totalTime + newShift <= self.maxHours:
             return True
 
-    def blacklist(self, day, dayClass):
-        self.blackList[day] = dayClass
+    def dayOff(self, day, dayClass):
+        self.dayOffStrToClass[day] = dayClass
 
-    def shiftBlacklist(self, day, start, end):
+    def shiftOff(self, day, startShift, endShift):
         try:
-            self.blackShiftDict[day]
-            self.blackShiftDict[day][start] = end
+            self.shiftOffDict[day]
+            self.shiftOffDict[day][startShift] = endShift
         except:
-            self.blackShiftDict[day] = {start: end}
+            self.shiftOffDict[day] = {startShift: endShift}
 
 '''
 classify all the days
@@ -384,56 +389,59 @@ Friday = Day()
 Saturday = Day()
 Sunday = Day()
 
-# dayList is used mostly for indexing purposes, as dictionaries have no index
-dayList = [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+'''
+dayClassList is used mostly for indexing purposes,
+as dictionaries have no index
+'''
+dayClassList = [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
 
-# dayPrintDict is for error checking the days off entries
-dayPrintDict = {'monday': Monday, 'tuesday': Tuesday, 'wednesday': Wednesday,
-                'thursday': Thursday, 'friday': Friday, 'saturday': Saturday,
-                'sunday': Sunday}
+# dayStrToClass is for error checking the days off entries
+dayStrToClass = {'monday': Monday, 'tuesday': Tuesday, 'wednesday': Wednesday,
+                 'thursday': Thursday, 'friday': Friday, 'saturday': Saturday,
+                 'sunday': Sunday}
 
 '''
- dayDict allows the class name to correlate with a string of the name for
+ dayClassToStr allows the class name to correlate with a string of the name for
  printing purposes
  NOTE: this should be eradicated and replaced with a method "print" in the
  day class
 '''
-dayDict = {Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday',
-           Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday',
-           Sunday: 'Sunday'}
+dayClassToStr = {Monday: 'Monday', Tuesday: 'Tuesday', Wednesday: 'Wednesday',
+                 Thursday: 'Thursday', Friday: 'Friday', Saturday: 'Saturday',
+                 Sunday: 'Sunday'}
 
 # get shift data for each day
-for day in dayList:
+for day in dayClassList:
     print '================================================'
-    dayVar = dayDict[day]
+    dayVar = dayClassToStr[day]
     shiftNum = CheckInt(raw_input('How many shifts for ' +
                                   dayVar + '? \n \n'))
     x = 0
     while x < shiftNum:
         while True:
             print '------------------------------------------------'
-            start = FormatTime(raw_input('Enter the STARTING time of the ' +
-                                         NumberIncrement(str(x+1)) +
-                                         ' shift on ' + dayVar + ": \n \n"))
-            start = CheckTime(start)
+            startShift = FormatTime(raw_input('Enter the STARTING time of the ' +
+                                              NumberIncrement(str(x+1)) +
+                                              ' shift on ' + dayVar + ": \n \n"))
+            start = CheckTime(startShift)
             print '------------------------------------------------'
-            end = FormatTime(raw_input('Enter the ENDING time of the ' +
+            endShift = FormatTime(raw_input('Enter the ENDING time of the ' +
                                        NumberIncrement(str(x+1)) +
                                        ' shift on ' + dayVar + ': \n \n' +
-                                       start + ' - '))
-            end = CheckTime(end)
+                                       startShift + ' - '))
+            endShift = CheckTime(endShift)
 
-            if TimetoDec(end) - TimetoDec(start) < 0:
+            if TimetoDec(endShift) - TimetoDec(startShift) < 0:
                 print "That's either an overnight shift or a mistake."
                 validate = raw_input("Do you want to keep it as is?\n\n")
                 if validate.lower() in ['yes', '', 'y', 'ye']:
-                    day.addShift(start, end)
+                    day.addShift(startShift, endShift)
                     break
                 else:
                     print "Ok, Let's try this again. \n"
                     pass
             else:
-                day.addShift(start, end)
+                day.addShift(startShift, endShift)
                 break
         print '\n--Added Shift-- \n\n'
         print '++++++++++++++++++++++++'
@@ -445,9 +453,9 @@ for day in dayList:
 # check that shifts are correct
 while True:
     print '\n\n++++++++++++++++++++++++'
-    for day in dayList:
+    for day in dayClassList:
         print '-----',
-        print dayDict[day],
+        print dayClassToStr[day],
         print '-----'
         day.viewShift()
         print ''
@@ -463,8 +471,8 @@ while True:
         while True:
             editDay = raw_input('What day do you need to edit?\n')
             editDay = editDay.lower()
-            if editDay in dayPrintDict:
-                editDay = dayPrintDict[editDay]
+            if editDay in dayStrToClass:
+                editDay = dayStrToClass[editDay]
                 while True:
                     print '++++++++++++++++++++++++'
                     editDay.viewShift()
@@ -477,30 +485,30 @@ while True:
                         print "\n**Sorry, I didn't get that**\n"
                         continue
                     if shiftIndex in range(0, len(editDay.shiftRegDict)+1):
-                    while True:
-                        print '-----------------------------------------------'
-                        inqueryString = ('Enter the new STARTING time of ' +
-                                         'shift ' + str(shiftIndex) + '\n\n')
-                        newStart = FormatTime(raw_input(inqueryString))
-                        newStart = CheckTime(newStart)
-                        print '-----------------------------------------------'
-                        inqueryString = ('Enter the new ENDING time of ' +
-                                         'shift ' + str(shiftIndex) + '\n\n')
-                        newEnd = FormatTime(raw_input(inqueryString))
-                        newEnd = CheckTime(newEnd)
-                        if TimetoDec(newEnd) - TimetoDec(newStart) < 0:
-                            print "That's either an overnight shift or a mistake."
-                            validate = raw_input("Do you want to keep it as is?\n\n")
-                            if validate.lower() in ['yes', '', 'y', 'ye']:
+                        while True:
+                            print '-----------------------------------------------'
+                            inqueryString = ('Enter the new STARTING time of ' +
+                                            'shift ' + str(shiftIndex) + '\n\n')
+                            newStart = FormatTime(raw_input(inqueryString))
+                            newStart = CheckTime(newStart)
+                            print '-----------------------------------------------'
+                            inqueryString = ('Enter the new ENDING time of ' +
+                                            'shift ' + str(shiftIndex) + '\n\n')
+                            newEnd = FormatTime(raw_input(inqueryString))
+                            newEnd = CheckTime(newEnd)
+                            if TimetoDec(newEnd) - TimetoDec(newStart) < 0:
+                                print "That's either an overnight shift or a mistake."
+                                validate = raw_input("Do you want to keep it as is?\n\n")
+                                if validate.lower() in ['yes', '', 'y', 'ye']:
+                                    editDay.editShift(shiftIndex-1, newStart, newEnd)
+                                    break
+                                else:
+                                    print "Ok, Let's try this again. \n"
+                                    pass
+                            else:
                                 editDay.editShift(shiftIndex-1, newStart, newEnd)
                                 break
-                            else:
-                                print "Ok, Let's try this again. \n"
-                                pass
-                        else:
-                            editDay.editShift(shiftIndex-1, newStart, newEnd)
-                            break
-                    break
+                        break
                     else:
                         print "\n**Sorry, I didn't get that**\n"
                         continue
@@ -513,8 +521,8 @@ while True:
         while True:
             editDay = raw_input('On what day do you need to remove a shift?\n')
             editDay = editDay.lower()
-            if editDay in dayPrintDict:
-                editDay = dayPrintDict[editDay]
+            if editDay in dayStrToClass:
+                editDay = dayStrToClass[editDay]
                 print '++++++++++++++++++++++++'
                 editDay.viewShift()
                 print '++++++++++++++++++++++++\n'
@@ -541,8 +549,8 @@ while True:
         while True:
             editDay = raw_input('On what day do you need to add a shift?\n')
             editDay = editDay.lower()
-            if editDay in dayPrintDict:
-                editDay = dayPrintDict[editDay]
+            if editDay in dayStrToClass:
+                editDay = dayStrToClass[editDay]
                 while True:
                     print '-----------------------------------------------'
                     inqueryString = ('Enter the new STARTING time of ' +
@@ -577,11 +585,11 @@ while True:
         print "\n**Sorry, I didn't get that**\n"
         continue
 '''
-tmDict and tmList work simlarly to dayDict and dayList to store classes and
-printable names for all the employees
+tmClassToStr and tmClassList work simlarly to dayClassToStr and dayClassList
+to store classes and printable names for all the employees
 '''
-tmDict = {}
-tmList = []
+tmClassToStr = {}
+tmClassList = []
 print '------------------------------------------------'
 tmNum = CheckInt(raw_input('How many employees are you staffing? \n \n'))
 
@@ -595,41 +603,41 @@ while x < tmNum:
     tmHours = CheckInt(raw_input('How many hours can %s work? \n \n' % name))
     classname = name
     classname = TM(tmHours)
-    tmList.append(classname)
-    tmDict[classname] = name
+    tmClassList.append(classname)
+    tmClassToStr[classname] = name
     while True:
         print '------------------------------------------------'
-        if len(classname.blackList) + len(classname.blackShiftDict) == 0:
-            blacklist = raw_input("What days can't %s work?"
-                                  % tmDict[classname].lower() +
+        if len(classname.dayOffStrToClass) + len(classname.shiftOffDict) == 0:
+            dayOff = raw_input("What days can't %s work?"
+                                  % tmClassToStr[classname].lower() +
                                   " (press enter if none) \n")
         else:
-            blacklist = raw_input("Are there any other days %s can't work?"
-                                  % tmDict[classname].lower() +
+            dayOff = raw_input("Are there any other days %s can't work?"
+                                  % tmClassToStr[classname].lower() +
                                   " (simply press enter when finished) \n")
-        if blacklist.lower() in dayPrintDict:
+        if dayOff.lower() in dayStrToClass:
             while True:
                 shiftCheck = raw_input("\n\n****Is " + name + " unavailable " +
-                                       "for all of " + blacklist + "?\n\n")
+                                       "for all of " + dayOff + "?\n\n")
                 if shiftCheck in ['n', 'no', 'No', 'NO', 'N']:
                     print "-----------------------------------------------"
                     inqueryString = ("Enter the STARTING time of " + name +
                                      "'s" + " unavailability for " +
-                                     blacklist + "\n\n")
-                    shiftBlacklistStart = FormatTime(raw_input(inqueryString))
-                    shiftBlacklistStart = CheckTime(shiftBlacklistStart)
+                                     dayOff + "\n\n")
+                    shiftOffStart = FormatTime(raw_input(inqueryString))
+                    shiftOffStart = CheckTime(shiftOffStart)
                     print "-----------------------------------------------"
                     inqueryString = ("Enter the ENDING time of " + name +
                                      "'s" + " unavailability for " +
-                                     blacklist + "\n\n")
-                    shiftBlacklistEnd = FormatTime(raw_input(inqueryString))
-                    shiftBlacklistEnd = CheckTime(shiftBlacklistEnd)
-                    classname.shiftBlacklist(blacklist, shiftBlacklistStart,
-                                             shiftBlacklistEnd)
+                                     dayOff + "\n\n")
+                    shiftOffEnd = FormatTime(raw_input(inqueryString))
+                    shiftOffEnd = CheckTime(shiftOffEnd)
+                    classname.shiftOff(dayOff, shiftOffStart,
+                                       shiftOffEnd)
                     break
 
                 elif shiftCheck in ['y', 'yes', 'Yes', 'YEs', 'YES', 'Y']:
-                    classname.blacklist(blacklist, dayPrintDict[blacklist])
+                    classname.dayOff(dayOff, dayStrToClass[dayOff])
                     break
                 else:
                     print "***Sorry, didn't get that.***"
@@ -637,9 +645,9 @@ while x < tmNum:
                            "the whole day)")
                     print ("Enter no if " + name + " is available for " +
                            "just a part of the day. \n")
-        elif blacklist in ['0', 'none', 'no', 'n', 'done']:
+        elif dayOff in ['0', 'none', 'no', 'n', 'done']:
             break
-        elif blacklist == '':
+        elif dayOff == '':
             break
         else:
             print "Please enter a day, or press enter to finish \n \n"
@@ -652,7 +660,7 @@ unassigned = TM(999999999999999999999999999999999)
 '''
 OK this is the convuluted part. Here goes:
 - For every shift, a string of random integers (which reperesent the index
-numbers of tmList) is generated.
+numbers of tmClassList) is generated.
 - Using these random integers, a tm is selcted at random. If they pass the
 "caWork" test, the shift is assigned to them. Otherwise, we just continue down
 the list.
@@ -662,27 +670,27 @@ and an error message is printed.
 
 print 'Assigning shifts...'
 unassignedString = ''
-for day in dayDict:
+for day in dayClassToStr:
     for shift in day.shiftDecDict:
         numList = []
-        for num in range(0, len(tmList)):
+        for num in range(0, len(tmClassList)):
             numList.append(num)
         random.shuffle(numList)
         x = 0
         while True:
             if x >= len(numList):
-                unassignedString += str(dayDict[day]) + '  '
+                unassignedString += str(dayClassToStr[day]) + '  '
                 unassignedString += str(DectoTime(shift)) + '-'
                 unassignedString += (str(DectoTime(day.shiftDecDict[shift])) +
                                      '\n')
-                unassigned.addShift(day, dayDict[day], shift,
+                unassigned.addShift(day, dayClassToStr[day], shift,
                                     day.shiftDecDict[shift])
                 break
             else:
-                shiftTM = tmList[numList[x]]
-            if shiftTM.canWork(day, dayDict[day], shift,
+                shiftTM = tmClassList[numList[x]]
+            if shiftTM.canWork(day, dayClassToStr[day], shift,
                                day.shiftDecDict[shift]):
-                shiftTM.addShift(day, dayDict[day], shift,
+                shiftTM.addShift(day, dayClassToStr[day], shift,
                                  day.shiftDecDict[shift])
                 break
             else:
@@ -732,44 +740,44 @@ notop = xlwt.easyxf('borders: bottom thick, left thick, right thick')
 # Onto the actual data input for excel
 x = 3
 y = 0
-while x < len(dayList)*3+3:
-    sheet.write_merge(0, 0, x, x+2, dayDict[dayList[y]], boldcenter)
+while x < len(dayClassList)*3+3:
+    sheet.write_merge(0, 0, x, x+2, dayClassToStr[dayClassList[y]], boldcenter)
     y += 1
     x += 3
 
-tmList.append(unassigned)
-tmDict[unassigned] = 'unassigned'
+tmClassList.append(unassigned)
+tmClassToStr[unassigned] = 'unassigned'
 sheet.write(0, 24, "Total Hours", bold)
 
 x = 1
-for tm in tmList:
-    sheet.write_merge(x, x+1, 0, 1, tmDict[tm], boldcenter)
+for tm in tmClassList:
+    sheet.write_merge(x, x+1, 0, 1, tmClassToStr[tm], boldcenter)
     for day in tm.printShiftDict:
         y = 0
         for shift in tm.printShiftDict[day]:
-            sheet.write(x+y, (dayList.index(day)*3)+3, shift, left)
-            sheet.write(x+y, (dayList.index(day)*3)+4, '-', center)
-            sheet.write(x+y, (dayList.index(day)*3)+5,
+            sheet.write(x+y, (dayClassList.index(day)*3)+3, shift, left)
+            sheet.write(x+y, (dayClassList.index(day)*3)+4, '-', center)
+            sheet.write(x+y, (dayClassList.index(day)*3)+5,
                         tm.printShiftDict[day][shift], right)
-            sheet.write_merge(x+y+1, x+y+1, (dayList.index(day)*3)+3,
-                              (dayList.index(day)*3)+5, '', notop)
+            sheet.write_merge(x+y+1, x+y+1, (dayClassList.index(day)*3)+3,
+                              (dayClassList.index(day)*3)+5, '', notop)
             y += 2
-    for day in tm.blackList:
-        sheet.write_merge(x, x+1, (dayList.index(tm.blackList[day])*3)+3,
-                          (dayList.index(tm.blackList[day])*3)+5,
+    for day in tm.dayOffStrToClass:
+        sheet.write_merge(x, x+1, (dayClassList.index(tm.dayOffStrToClass[day])*3)+3,
+                          (dayClassList.index(tm.dayOffStrToClass[day])*3)+5,
                           'Not Available', grey)
     sheet.write_merge(x, x+1, 24, 24, tm.totalTime, thick)
     x += 2
 
 x = 1
-while x < len(tmList)*2+1:
+while x < len(tmClassList)*2+1:
     sheet.write_merge(x, x+1, 2, 2, '', thick)
     x += 2
 
 x = 1
-while x <= len(tmList)*2:
+while x <= len(tmClassList)*2:
     y = 1
-    while y <= len(dayList)*3+3:
+    while y <= len(dayClassList)*3+3:
         try:
             sheet.write_merge(x, x+1, y, y+2, 'OFF', grey)
         except:
