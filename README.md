@@ -3,7 +3,12 @@
 
 An employee scheduling script. 
 
-Warning: I am a beginner programmer. Take this app with a grain of salt.
+Warning: This is meant largely as an excercise for myself. Take this app with a grain of salt. 
+I plan on porting a more robust, user-friendly version to a web app in the near future (summer 2015).
+
+
+## Inpiration
+=============
 
 After 7 years of retail and countless excuses from management about the
 difficulty of creating a schedule, I decided to try to ease the process.
@@ -16,7 +21,7 @@ randomly assigns shifts to employees based on their available days and hours
 and neatly exports the data to an excel file for further manipulation. 
 
 Currently, Scheduler is simply a python script and can be run from the command
-line. I hope to make either a GUI excecutable or web app for use in the future.
+line. I plan on porting to a web app for use in the future.
 
 ## What Scheduler Is Not
 =========================
@@ -30,11 +35,13 @@ excel schedule is produced which you are free to manipulate to your will.
 ## How to use
 =============
 
-To run the app from the source, you must have 
-[python 2.7](www.python.org/downloads) and the [xlwt](pypi.python.org/pypi/xlwt) 
+Short version: run the executable and follow the prompts.
+
+Long version: To run the app from the source, you must have 
+[python 2.7.*](www.python.org/downloads) and the [xlwt](pypi.python.org/pypi/xlwt) 
 library. I have also packaged the app up into a .exe using [pyinstaller](www.pyinstaller.org),
 which you can simply download and run, if that's easier. Scheduler will output 
-your .xls file in the same directory as the program itself. Look for "schedule.xls".
+your .xls schedule in the same directory as the program itself. Look for "schedule.xls".
 
 Once you have the app running, the process is relatively intuitive. You are first
 walked through the week and asked for how many shifts in a given day, along with
@@ -46,6 +53,6 @@ and days off for each employee.
 
 The app will log any unassigned shift at the bottom of the schedule, under 
 "unassigned." You are free to adjust these shifts according to your need. It's 
-your schedule!
+your schedule now!
 
 
