@@ -3,8 +3,7 @@
 
 An employee scheduling script. 
 
-Warning: This is meant largely as an excercise for myself. Take this app with a grain of salt. 
-I plan on porting a more robust, user-friendly version to a web app in the near future (summer 2015).
+This is meant largely as an excercise for myself. Take this app with a grain of salt. 
 
 
 ## Inpiration
