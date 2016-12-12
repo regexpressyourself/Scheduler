@@ -1,4 +1,4 @@
-# Scheduler
+# Scheduler.py
 =========
 
 An employee scheduling script. 
@@ -12,20 +12,20 @@ This is meant largely as an excercise for myself. Take this app with a grain of 
 After 7 years of retail and countless excuses from management about the
 difficulty of creating a schedule, I decided to try to ease the process.
 
-## What Scheduler Is
+## What Scheduler.py Is
 =====================
 
-Scheduler is designed to give a comprehensive starting point for a schedule. It
+Scheduler.py is designed to give a comprehensive starting point for a schedule. It
 randomly assigns shifts to employees based on their available days and hours
-and neatly exports the data to an excel file for further manipulation. 
+and.py neatly exports the data to an excel file for further manipulation. 
 
-Currently, Scheduler is simply a python script and can be run from the command
+Currently, Scheduler.py is simply a python script and can be run from the command
 line. I plan on porting to a web app for use in the future.
 
-## What Scheduler Is Not
+## What Scheduler.py Is Not
 =========================
 
-Scheduler is not meant to be interactive scheduling software. Its purpose is 
+Scheduler.py is not meant to be interactive scheduling software. Its purpose is 
 simply to give you a starting point to build on. It will randomly assign shifts 
 to employees while adhering to days off, hours per week, and some other nuanced
 shift constraints. While the process is not interactive, a  well-formatted 
@@ -39,7 +39,7 @@ Short version: run the executable and follow the prompts.
 Long version: To run the app from the source, you must have 
 [python 2.7.*](www.python.org/downloads) and the [xlwt](pypi.python.org/pypi/xlwt) 
 library. I have also packaged the app up into a .exe using [pyinstaller](www.pyinstaller.org),
-which you can simply download and run, if that's easier. Scheduler will output 
+which you can simply download and run, if that's easier. Scheduler.py will output 
 your .xls schedule in the same directory as the program itself. Look for "schedule.xls".
 
 Once you have the app running, the process is relatively intuitive. You are first
