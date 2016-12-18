@@ -3,9 +3,6 @@
 
 An employee scheduling script. 
 
-This is meant largely as an excercise for myself. Take this app with a grain of salt. 
-
-
 ## Inpiration
 =============
 

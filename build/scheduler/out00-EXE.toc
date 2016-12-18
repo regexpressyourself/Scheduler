@@ -1,9 +1,0 @@
-('/home/zookeeprr/documents/Scheduler/dist/scheduler',
- True,
- False,
- None,
- None,
- [],
- None,
- False,
- 1424817731)
